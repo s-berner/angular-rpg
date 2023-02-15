@@ -6,5 +6,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./welcome-screen.component.css']
 })
 export class WelcomeScreenComponent {
+  playerName = '';
+  constructor() { }
+
+  test() {
+    console.log(this.playerName);
+  }
 
 }

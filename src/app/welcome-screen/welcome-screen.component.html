@@ -1,8 +1,9 @@
 <div class="welcome-screen">
-    <div class="welcome-screen-title">Welcome to my Angular-RPG</div>
+    <div class="welcome-screen-title">Welcome to my Angular-RPG{{playerName ? ', ' + playerName : ''}}</div>
+    <input type="text" placeholder="Enter your username" class="welcome-screen-input" [(ngModel)]="playerName">
     <div class="welcome-screen-button-container">
-        <button class="button">Start Game</button>
-
+        <button class="button" routerLink="/game">Start your Journey</button>
+        <button class="button" (click)="test()">Resume your Journey</button>
     </div>
 </div>
     
