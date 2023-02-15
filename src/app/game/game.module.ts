@@ -1,12 +1,19 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { GameLevelComponent } from './game-level/game-level.component';
+import { GameCombatComponent } from './game-combat/game-combat.component';
+import { GameRoutingModule } from './game-routing.module';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    GameLevelComponent,
+    GameCombatComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    GameRoutingModule
   ]
 })
 export class GameModule { }
