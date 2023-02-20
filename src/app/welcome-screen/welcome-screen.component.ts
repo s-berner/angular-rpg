@@ -12,5 +12,4 @@ export class WelcomeScreenComponent {
   test() {
     console.log(this.playerName);
   }
-
 }
