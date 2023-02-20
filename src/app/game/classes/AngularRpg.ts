@@ -5,6 +5,7 @@ export class AngularRpg {
     player: Player;
     stage = 1;
     elements: GameElement[] = [];
+    grid: string[][] = [];
       
     constructor(playName: string) {
         this.player = new Player(playName, 2, 2);

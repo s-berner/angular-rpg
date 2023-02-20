@@ -1,0 +1,13 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    border: 3px ridge brown;
+}
+
+.grid-item {
+    width: 75px;
+    height: 75px;
+    background-color: var(--floor);
+    border: .1px solid brown;
+}
