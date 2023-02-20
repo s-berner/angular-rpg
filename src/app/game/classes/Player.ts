@@ -1,5 +1,6 @@
 import { MoveableEntity } from './MovableEntity';
-import { Item } from '../interfaces/Item';
+import { Item } from './Item';
+import { ElementType } from '../enums/ElementType';
 
 export class Player extends MoveableEntity {
     level = 1;
@@ -8,6 +9,7 @@ export class Player extends MoveableEntity {
     currentHealth = this.maxHealth;
     attributes = { strength: 5, armor: 10, agility: 10 };
     inventory: Item[] = [];
+    type: ElementType = ElementType.Player;
 
     constructor (
         public name: string,
