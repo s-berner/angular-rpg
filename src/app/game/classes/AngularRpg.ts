@@ -3,14 +3,14 @@ import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 import { Inputs } from "../enums/Inputs";
 import { GameElement } from "../interfaces/GameElement";
-import { Item } from "../interfaces/Item";
+import { Item } from "./Item";
 import { Position } from "../interfaces/Position";
 
 export class AngularRpg {
   player: Player;
+  grid: Grid;
   currentStage = 3;
   elements: GameElement[] = [];
-  grid: Grid;
       
   constructor(
     playName: string, 
@@ -21,8 +21,8 @@ export class AngularRpg {
       this.generateEntites();
   }
 
-  movePlayer(direction: Inputs): void {
-    this.player.move(direction);
+  handlePlayerInput(direction: Inputs): void {
+    this.player.move(direction, this.elements);
   }
 
   initStage(): void {
@@ -63,7 +63,7 @@ export class AngularRpg {
   
     for (let i = 0; i < amount; i++) {
       const position = this.generateRandomPosition();
-      const enemy = new Enemy('enemy' + i, position.x, position.y);
+      const enemy = new Enemy('e' + i, position.x, position.y);
       enemies.push(enemy);
     }
     return enemies;

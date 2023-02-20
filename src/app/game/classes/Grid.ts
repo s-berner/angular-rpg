@@ -35,4 +35,12 @@ export class Grid  {
     
     return formattedGrid;
   }
+
+  getTile(x: number, y: number): GameElement {
+    return this.grid[y][x];
+  }
+
+  tileIsBlocked(x: number, y: number): boolean {
+    return this.grid[y][x] !== '';
+  }
 }
