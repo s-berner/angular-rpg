@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, Output} from '@angular/core';
 import { AngularRpg } from '../classes/AngularRpg';
 import { Enemy } from '../classes/Enemy';
 import { Player } from '../classes/Player';
-import { GameElement } from '../interfaces/GameElement';
+import { Inputs } from '../enums/Inputs';
 
 @Component({
   selector: 'app-game-level',
@@ -14,48 +14,8 @@ export class GameLevelComponent implements OnInit {
   @Output()htmlGrid: string[][] = [];
   
   ngOnInit(): void {
-    this.initHtmlGrid();
-    this.drawGame();
-  }
-
-  drawGame(): void {
-    this.game = new AngularRpg('dude');
-    this.game.elements.forEach(object => {
-      if (object instanceof Player || object instanceof Enemy) {
-        const position = object.getPosition();
-        if (object instanceof Player) {
-          console.log('player exits at: ' + position.x + ', ' + position.y);
-          this.htmlGrid[position.y][position.x] = object.name;
-        } else {
-          console.log('enemy exits at: ' + position.x + ', ' + position.y);
-          this.htmlGrid[position.y][position.x] = 'placeholder';
-        }
-      }
-    });
-  }
-
-  redrawGame(): void {
-    this.game.elements.forEach(object => {
-      if (object instanceof Player || object instanceof Enemy) {
-        const position = object.getPosition();
-        if (object instanceof Player) {
-          console.log('player exits at: ' + position.x + ', ' + position.y);
-          this.htmlGrid[position.y][position.x] = object.name;
-        } else {
-          console.log('enemy exits at: ' + position.x + ', ' + position.y);
-          this.htmlGrid[position.y][position.x] = 'E';
-        }
-      }
-    });
-  }
-
-  initHtmlGrid(): void {
-    for (let i = 0; i < 10; i++) {
-      this.htmlGrid[i] = [];
-      for (let j = 0; j < 10; j++) {
-        this.htmlGrid[i][j] = '';
-      }
-    }
+    this.game = new AngularRpg('dude', 10, 10);
+    this.htmlGrid = this.game.getFormattedGrid();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -64,64 +24,47 @@ export class GameLevelComponent implements OnInit {
       case 'w':
         // move player up
         console.log('w pressed');
-        this.movePlayer('up');
+        this.game.movePlayer(Inputs.Up);
         break;
       case 'ArrowUp':
         // move player up
         console.log('arrowup pressed');
-        this.movePlayer('up');
+        this.game.movePlayer(Inputs.Up);
         break;
       case 'a':
         // move player left
         console.log('a pressed');
-        this.movePlayer('left');
+        this.game.movePlayer(Inputs.Left);
         break;
       case 'ArrowLeft':
         // move player left
         console.log('arrowleft pressed');
-        this.movePlayer('left');
+        this.game.movePlayer(Inputs.Left);
         break;
       case 's':
         // move player down
         console.log('s pressed');
-        this.movePlayer('down');
+        this.game.movePlayer(Inputs.Down);
         break;
       case 'ArrowDown':
         // move player down
         console.log('arrowdown pressed');
-        this.movePlayer('down');
+        this.game.movePlayer(Inputs.Down);
         break;
       case 'd':
         // move player right
         console.log('d pressed');
-        this.movePlayer('right');
+        this.game.movePlayer(Inputs.Right);
         break;
       case 'ArrowRight':
         // move player right
         console.log('arrowright pressed');
-        this.movePlayer('right');
+        this.game.movePlayer(Inputs.Right);
         break;
     }
   
     // TODO: make enemys move after player moves
 
-    // updateGame
-    this.redrawGame();
-  }
-
-  movePlayer(direction: string): void {
-    this.game.elements.forEach(object => {
-      if (object instanceof Player) {
-        const prevPosition = object.getPosition();
-        try {
-          object.move(direction);
-        } catch (error) {
-          console.error(error)
-          return;
-        } finally {
-          this.htmlGrid[prevPosition.y][prevPosition.x] = '';
-        }
-      }
-    });
+    this.htmlGrid = this.game.getFormattedGrid();
   }
 }
