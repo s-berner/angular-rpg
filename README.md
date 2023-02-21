@@ -1,5 +1,4 @@
 # AngularRpg
-
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.5.
 
 # remember
@@ -34,8 +33,12 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 	Verliert der Spieler seine Lebenspunkte ist das Spiel beendet.
 
 # to do for step #2
-- make enemies move
+- make enemies move ✅, adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
+or pick a direction and walk it until obstructed
 - combat view
 
-# later
+# misc
 - make player also spawn randomly ✅
+- fix enemy stacking ✅
+- fix that enemies can walk onto the door ✅
+- add tree clusters as obstruction
