@@ -15,7 +15,7 @@ export class Grid  {
     for (let i = 0; i < height; i++) {
       this.grid[i] = [];
       for (let j = 0; j < width; j++) {
-        this.grid[i][j] = '';
+        this.grid[i][j] = undefined;
       }
     }
   }
@@ -41,6 +41,6 @@ export class Grid  {
   }
 
   tileIsBlocked(x: number, y: number): boolean {
-    return this.grid[y][x] !== '';
+    return this.grid[y][x] !== undefined;
   }
 }
