@@ -29,9 +29,9 @@ export class AngularRpg {
     this.generateElements();
   }
 
-  handlePlayerInput(direction: Inputs): void {
+  operateGame(direction: Inputs): void {
     // handle the players move
-    this.elements = this.player.move(direction, this.elements);
+    this.elements = this.player.move(direction, this.elements, ElementType.Player);
 
     // if the player used the exit
     const exitUsed = !this.elements.some(element => element?.type === ElementType.Exit);
@@ -39,10 +39,16 @@ export class AngularRpg {
     if(exitUsed) {
       this.currentStage++;
       this.generateElements();
+      return;
     }
 
-    // TODO: move each enemy
-    // ...
+    // move each enemy
+    this.elements.forEach(element => {
+      if (element?.type === ElementType.Enemy) {
+        const enemy = element as Enemy;
+        enemy.randomMove(this.elements);
+      }
+    });
   }
 
   initStage(): void {

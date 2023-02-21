@@ -19,21 +19,23 @@ export class Enemy extends MoveableEntity {
     
   randomMove(elements: GameElement[]): void {
     const direction = Math.floor(Math.random() * 4);
+    let input = Inputs.None;
     switch (direction) {
       case 0:
-        this.move(Inputs.Down, elements);
+        input = Inputs.Down;
         break;
       case 1:
-        this.move(Inputs.Up, elements);
+        input = Inputs.Up;
         break;
       case 2:
-        this.move(Inputs.Left, elements);
+        input = Inputs.Left;
         break;
       case 3:
-        this.move(Inputs.Right, elements);
+        input = Inputs.Right;
         break;
       default:
-        this.move(Inputs.None, elements);
+        input = Inputs.None;
     }
+    this.move(input, elements, this.type);
   }
 }

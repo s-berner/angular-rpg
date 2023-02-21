@@ -18,7 +18,7 @@ export class MoveableEntity {
     return { x: this.x, y: this.y };
   }
 
-  move(direction: Inputs, elements: GameElement[]): GameElement[] {
+  move(direction: Inputs, elements: GameElement[], myType: ElementType): GameElement[] {
     if (direction == Inputs.None) {
       return elements;
     }
@@ -66,6 +66,11 @@ export class MoveableEntity {
 
       switch (occupant?.type) {
         case ElementType.Enemy:
+          // prevent enemies stacking in same tile
+          if (myType === ElementType.Enemy) {
+            console.log('can\'t move, to', desiredPos, 'occupied by enemy');
+            return elements;
+          }
           // TODO: init combat
           console.log('🔪 fighting', occupant.name, 'at', desiredPos, 'and won 🔪🩸');
           elements = elements.filter(element => element?.name !== occupant.name);
@@ -76,14 +81,20 @@ export class MoveableEntity {
           return elements;
         case ElementType.Wall:
           // cant move 
-          // TODO: display message to player
+          if(myType === ElementType.Player) {
+            // TODO: display message to player
+          }
           console.log('can\'t move, to', desiredPos, 'occupied by wall');
           return elements;
         case ElementType.Player:
           // ? how do i want to handle if enemy wants to move into player
           return elements;
         case ElementType.Exit:
-          console.log('can move, to', desiredPos, 'occupied by exit');
+          if(myType === ElementType.Enemy) {
+            console.log('enemy can\'t move, to', desiredPos, 'occupied by exit');
+            return elements;
+          }
+          console.log('player can move, to', desiredPos, 'occupied by exit');
           elements = elements.filter(element => element?.type === ElementType.Player);
           break;
         default:
