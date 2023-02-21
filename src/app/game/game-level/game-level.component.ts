@@ -20,28 +20,28 @@ export class GameLevelComponent implements OnInit {
   onKeypress(event: KeyboardEvent): void {
     switch(event.key) {
       case 'w':
-        this.game.handlePlayerInput(Inputs.Up);
+        this.game.operateGame(Inputs.Up);
         break;
       case 'ArrowUp':
-        this.game.handlePlayerInput(Inputs.Up);
+        this.game.operateGame(Inputs.Up);
         break;
       case 'a':
-        this.game.handlePlayerInput(Inputs.Left);
+        this.game.operateGame(Inputs.Left);
         break;
       case 'ArrowLeft':
-        this.game.handlePlayerInput(Inputs.Left);
+        this.game.operateGame(Inputs.Left);
         break;
       case 's':
-        this.game.handlePlayerInput(Inputs.Down);
+        this.game.operateGame(Inputs.Down);
         break;
       case 'ArrowDown':
-        this.game.handlePlayerInput(Inputs.Down);
+        this.game.operateGame(Inputs.Down);
         break;
       case 'd':
-        this.game.handlePlayerInput(Inputs.Right);
+        this.game.operateGame(Inputs.Right);
         break;
       case 'ArrowRight':
-        this.game.handlePlayerInput(Inputs.Right);
+        this.game.operateGame(Inputs.Right);
         break;
     }
   
