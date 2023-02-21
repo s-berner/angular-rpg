@@ -1,0 +1,5 @@
+<div class="grid-container">
+    <ng-container *ngFor="let row of grid">
+        <div *ngFor="let tile of row" class="grid-item" [innerHTML]="tile"></div>
+    </ng-container>
+</div>
