@@ -23,13 +23,10 @@ export class Grid  {
   formatGrid(): string[][] {
     const formattedGrid: string[][] = this.grid.map(row => {
       return row.map(cell => {
-        if (cell instanceof Player) {
+        if (cell?.type) {
           return cell.name;
-        } else if (cell instanceof Enemy) {
-          return cell.name;
-        } else {
-          return '';
-        }
+        } 
+        return '';
       });
     });
     

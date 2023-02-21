@@ -82,6 +82,10 @@ export class MoveableEntity {
         case ElementType.Player:
           // ? how do i want to handle if enemy wants to move into player
           return elements;
+        case ElementType.Exit:
+          console.log('can move, to', desiredPos, 'occupied by exit');
+          elements = elements.filter(element => element?.type === ElementType.Player);
+          break;
         default:
           // case that would go here is ElementType.Empty or undefined?
           return elements;

@@ -14,7 +14,7 @@ export class GameLevelComponent implements OnInit {
   @Output()htmlGrid: string[][] = [];
   
   ngOnInit(): void {
-    this.game = new AngularRpg('dude', 10, 10);
+    this.game = new AngularRpg('🧙', 10, 10);
     this.htmlGrid = this.game.getFormattedGrid();
   }
 

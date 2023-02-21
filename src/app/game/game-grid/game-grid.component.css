@@ -10,4 +10,7 @@
     height: 75px;
     background-color: var(--floor);
     border: .1px solid brown;
+    text-align: center;
+    font-size: 30px;
+    line-height: 75px;
 }
