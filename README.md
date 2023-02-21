@@ -34,8 +34,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 	Verliert der Spieler seine Lebenspunkte ist das Spiel beendet.
 
 # to do for step #2
-	- make enemies move
-	- combat view
+- make enemies move
+- combat view
 
 # later
-	- make player also spawn randomly ✅
+- make player also spawn randomly ✅
