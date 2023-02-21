@@ -2,10 +2,6 @@ import { ElementType } from "../enums/ElementType";
 import { Inputs } from "../enums/Inputs";
 import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
-import { Enemy } from "./Enemy";
-import { Grid } from "./Grid";
-import { Player } from "./Player";
-import { Item } from "./Item";
 
 /** 
  * TODO: Check for collisions with other entities (enemies, items, walls, etc.)
@@ -18,94 +14,97 @@ export class MoveableEntity {
     private x: number,
     private y: number) { }
     
-  private moveUp(elements: GameElement[]): void {
-    // Create new position object
-    const newPosition = { x: this.x, y: this.y - 1 };
-
-    // Check if new position is out of bounds
-    const outOfBounds = newPosition.y < 0;
-    if (outOfBounds) {
-      console.log(this.outOfBoundsMsg);
-      return;
-    }
-
-    // Check if new position is occupied
-    const occupiedPositions = elements.map(element => {
-      if ('player' == element?.type|| element instanceof Item) {
-        return element.getPosition()
-      }
-      return;
-    });
-    const occupied = occupiedPositions.some(position => {
-      if (position) {
-        return position.x === newPosition.x && position.y === newPosition.y;
-      }
-      return false;
-    });
-    if (occupied) {
-      console.log('can\'t move to occupied position');
-      return;
-    }
-
-      
-
-    this.y--;
-    console.log('moved entity up to: ' + this.x + ', ' + this.y);
-  }
-
-  private moveDown(): void {
-    const invalidMove = this.y > this.mapHeight - 2;
-    if (invalidMove) {
-      console.log(this.outOfBoundsMsg);
-      return;
-    }
-    this.y++;
-    console.log('moved entity down to: ' + this.x + ', ' + this.y);
-  }
-
-  private moveLeft(): void {
-    const invalidMove = this.x < 1;
-    if (invalidMove) {
-      console.log(this.outOfBoundsMsg);
-      return;
-    }
-    this.x--;
-    console.log('moved entity left to: ' + this.x + ', ' + this.y);
-  }
-
-  private moveRight(): void {
-    const invalidMove = this.x > this.mapWidth - 2;
-    if (invalidMove) {
-      console.log(this.outOfBoundsMsg);
-      return;
-    }
-    
-    this.x++;
-    console.log('moved entity right to: ' + this.x + ', ' + this.y);
-  }
-
   getPosition(): Position {
     return { x: this.x, y: this.y };
   }
 
-  move(direction: Inputs, elements: GameElement[]): void {
+  move(direction: Inputs, elements: GameElement[]): GameElement[] {
     if (direction == Inputs.None) {
-      return;
+      return elements;
     }
 
+    // get desired position
+    const desiredPos: Position = this.getPosition(); 
     switch(direction) {
       case Inputs.Up:
-        this.moveUp(elements);
+        desiredPos.y--;
         break;
       case Inputs.Down:
-        this.moveDown();
+        desiredPos.y++;
         break;
       case Inputs.Left:
-        this.moveLeft();
+        desiredPos.x--;
         break;
       case Inputs.Right:
-        this.moveRight();
+        desiredPos.x++;
         break;
     }
+
+    // check if desired position is out of bounds
+    const outOfBounds = this.checkIfOutOfBounds(desiredPos);
+    if (outOfBounds) {
+      // TODO: display message to user
+      console.log(this.outOfBoundsMsg);
+      return elements;
+    }
+
+    // check if desired position is occupied
+    const blockedPositions = elements
+      .filter(element => element !== undefined)
+      .map(element => element?.getPosition()) as Position[];
+    const isOccupied = this.checkIfPosOccupied(desiredPos, blockedPositions);
+    if(isOccupied) {
+      // check what occupies the tile and handle each case accordingly
+      const occupant = elements.filter(element => {
+        const curPos = element?.getPosition()
+        if (curPos) {
+          return curPos.x === desiredPos.x && curPos.y === desiredPos.y;
+        }
+
+        return false;
+      })[0] as GameElement;
+
+      switch (occupant?.type) {
+        case ElementType.Enemy:
+          // TODO: init combat
+          console.log('🔪 fighting', occupant.name, 'at', desiredPos, 'and won 🔪🩸');
+          elements = elements.filter(element => element?.name !== occupant.name);
+          break;
+        case ElementType.Item:
+          // TODO: pick up item
+          console.log('can move, to', desiredPos, 'occupied by item');
+          return elements;
+        case ElementType.Wall:
+          // cant move 
+          // TODO: display message to player
+          console.log('can\'t move, to', desiredPos, 'occupied by wall');
+          return elements;
+        case ElementType.Player:
+          // ? how do i want to handle if enemy wants to move into player
+          return elements;
+        default:
+          // case that would go here is ElementType.Empty or undefined?
+          return elements;
+      }
+    }
+
+    // if move is valid and tile is not occupied move the entity
+    this.x = desiredPos.x;
+    this.y = desiredPos.y;  
+    
+    return elements;      
+  }
+
+  checkIfOutOfBounds(desiredPos: Position): boolean {
+    const outOfBounds = desiredPos.x < 0 || desiredPos.x > this.mapWidth - 1 || desiredPos.y < 0 || desiredPos.y > this.mapHeight - 1;
+    return outOfBounds;
+  }	
+
+  checkIfPosOccupied(desiredPos: Position, blockedPositions: Position[]): boolean {
+    const occupied = blockedPositions.some(blockedPos => {
+      return blockedPos.x === desiredPos.x && blockedPos.y === desiredPos.y;
+    });
+
+    return occupied;
   }
 }
