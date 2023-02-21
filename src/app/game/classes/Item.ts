@@ -1,4 +1,3 @@
-import { MoveableEntity } from "./MovableEntity";
 import { Position } from "../interfaces/Position";
 import { ElementType } from "../enums/ElementType";
 

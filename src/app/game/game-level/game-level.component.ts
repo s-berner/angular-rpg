@@ -1,7 +1,5 @@
-import { Component, HostListener, OnInit, Output} from '@angular/core';
+import { Component, HostListener, OnInit, Output } from '@angular/core';
 import { AngularRpg } from '../classes/AngularRpg';
-import { Enemy } from '../classes/Enemy';
-import { Player } from '../classes/Player';
 import { Inputs } from '../enums/Inputs';
 
 @Component({

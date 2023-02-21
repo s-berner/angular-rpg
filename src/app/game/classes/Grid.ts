@@ -1,6 +1,4 @@
 import { GameElement } from "../interfaces/GameElement";
-import { Player } from "./Player";
-import { Enemy } from "./Enemy";
 
 export class Grid  {
   grid: GameElement[][] = [];

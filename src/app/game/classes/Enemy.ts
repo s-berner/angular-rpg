@@ -2,7 +2,6 @@ import { MoveableEntity } from './MovableEntity';
 import { Item } from './Item';
 import { Inputs } from '../enums/Inputs';
 import { ElementType } from '../enums/ElementType';
-import { Grid } from './Grid';
 import { GameElement } from '../interfaces/GameElement';
 
 export class Enemy extends MoveableEntity {
