@@ -13,16 +13,17 @@ export class AngularRpg {
   elements: GameElement[] = [];
       
   constructor(
-    playName: string, 
+    playerName: string, 
     height?: number, 
-    width?: number) {
-      this.player = new Player(playName, 2, 2);
-      this.grid = new Grid(height || 10, width || 10);
-      this.generateEntites();
+    width?: number
+  ) {
+    this.player = new Player(playerName, 2, 2);
+    this.grid = new Grid(height || 10, width || 10); // Default grid size is 10x10	
+    this.generateEntites();
   }
 
   handlePlayerInput(direction: Inputs): void {
-    this.player.move(direction, this.elements);
+    this. elements = this.player.move(direction, this.elements);
   }
 
   initStage(): void {
@@ -53,7 +54,6 @@ export class AngularRpg {
 
   generateEnemies(amount: number): Enemy[] {
     const enemies: Enemy[] = [];
-    
     const blockedPositions: Position[] = [];
     this.elements.forEach(element => {
       if (element instanceof Player) {
@@ -68,7 +68,6 @@ export class AngularRpg {
     }
     return enemies;
   }
-
 
   populateGrid(): void {
     this.grid.initGrid(this.grid.width, this.grid.height);
