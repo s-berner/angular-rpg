@@ -19,46 +19,30 @@ export class GameLevelComponent implements OnInit {
   }
 
   @HostListener('window:keydown', ['$event'])
-  onKeypress(event: KeyboardEvent) {
+  onKeypress(event: KeyboardEvent): void {
     switch(event.key) {
       case 'w':
-        // move player up
-        console.log('w pressed');
         this.game.handlePlayerInput(Inputs.Up);
         break;
       case 'ArrowUp':
-        // move player up
-        console.log('arrowup pressed');
         this.game.handlePlayerInput(Inputs.Up);
         break;
       case 'a':
-        // move player left
-        console.log('a pressed');
         this.game.handlePlayerInput(Inputs.Left);
         break;
       case 'ArrowLeft':
-        // move player left
-        console.log('arrowleft pressed');
         this.game.handlePlayerInput(Inputs.Left);
         break;
       case 's':
-        // move player down
-        console.log('s pressed');
         this.game.handlePlayerInput(Inputs.Down);
         break;
       case 'ArrowDown':
-        // move player down
-        console.log('arrowdown pressed');
         this.game.handlePlayerInput(Inputs.Down);
         break;
       case 'd':
-        // move player right
-        console.log('d pressed');
         this.game.handlePlayerInput(Inputs.Right);
         break;
       case 'ArrowRight':
-        // move player right
-        console.log('arrowright pressed');
         this.game.handlePlayerInput(Inputs.Right);
         break;
     }
