@@ -1,26 +1,23 @@
-import { Grid } from "./Grid";
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
-import { Inputs } from "../enums/Inputs";
+import { Exit } from "./Exit";
+import { Obstruction } from "./Obstruction";
 import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
-import { Exit } from "./Exit";
+import { Inputs } from "../enums/Inputs";
 import { ElementType } from "../enums/ElementType";
 
 export class AngularRpg {
   player: Player;
-  grid: Grid;
-  currentStage = 3;
+
+  currentStage = 0;
   elements: GameElement[] = [];
       
   constructor(
     playerName: string, 
-    height?: number, 
-    width?: number
+    readonly height: number, 
+    readonly width: number
   ) {
-    // init grid object
-    this.grid = new Grid(height || 10, width || 10); // Default grid size is 10x10
-
     // init player object
     const playerPos = this.generateRandomPosition();
     this.player = new Player(playerName, playerPos.x, playerPos.y);
@@ -34,6 +31,7 @@ export class AngularRpg {
     this.elements = this.player.move(direction, this.elements, ElementType.Player);
 
     // if the player used the exit
+    // TODO: check if the player is on the exit
     const exitUsed = !this.elements.some(element => element?.type === ElementType.Exit);
 
     if(exitUsed) {
@@ -55,11 +53,6 @@ export class AngularRpg {
     this.generateElements();
   }
 
-  getFormattedGrid(): string[][] {
-    this.populateGrid();
-    return this.grid.formatGrid();
-  }
-
   generateElements(): void {
     // ! player is persistent so they are not generated here
     // Clear game elements
@@ -68,6 +61,11 @@ export class AngularRpg {
     // Add player
     this.elements.push(this.player);
 
+    // Generate obstructions
+    for (let i = 0; i < 3; i++) {
+      this.elements.push(...this.generateObstructionCluster(this.elements.map(element => element?.getPosition()) as Position[]));
+    }
+  
     // add exit
     const exitPos = this.generateRandomPosition(this.elements.map(element => element?.getPosition()) as Position[]);
     const exit = new Exit(20, this.currentStage + 1, exitPos.x, exitPos.y);
@@ -89,28 +87,19 @@ export class AngularRpg {
     for (let i = 0; i < amount; i++) {
       const position = this.generateRandomPosition(blockedPositions);
       blockedPositions.push(position)
-      const enemy = new Enemy('🧟' + i, position.x, position.y);
+      const enemy = new Enemy('e' + i, '🧟', position.x, position.y);
       enemies.push(enemy);
     }
     return enemies;
   }
 
-  populateGrid(): void {
-    this.grid.initGrid(this.grid.width, this.grid.height);
-    this.elements.forEach(element => {
-      if (element?.type) {
-        const position = element.getPosition();
-        this.grid.grid[position.y][position.x] = element;
-      }
-    });
-  }
-
   generateRandomPosition(blockedPositions?: Position[]): Position {
-    const randomX = Math.floor(Math.random() * this.grid.width);
-    const randomY = Math.floor(Math.random() * this.grid.height);
+    const randomX = Math.floor(Math.random() * this.width);
+    const randomY = Math.floor(Math.random() * this.height);
     const position: Position = { x: randomX, y: randomY };
     if (blockedPositions) {
-      if (blockedPositions.includes(position)) {
+      const positionIsBlocked = blockedPositions.some(blockedPosition => blockedPosition.x === position.x && blockedPosition.y === position.y)
+      if (positionIsBlocked) {
         return this.generateRandomPosition(blockedPositions);
       } else {
         return position;
@@ -118,5 +107,46 @@ export class AngularRpg {
     } 
     
     return position;
+  }
+
+  generateObstructionCluster(blockedPositions?: Position[]): Obstruction[] {
+    // look for cluster of free spaces
+    const freeSpaces: Position[] = [];
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const possiblePosition: Position = { x, y };
+        const positionBlocked = blockedPositions?.some(position => {
+          return position.x === possiblePosition.x && position.y === possiblePosition.y;
+        });
+        if (positionBlocked) {
+          continue;
+        }
+        freeSpaces.push(possiblePosition);
+      }
+    }
+
+    // handle no free spaces
+    const noFreeSpaces = freeSpaces.length === 0;
+    if (noFreeSpaces) {
+      return [];
+    }
+
+    // pick a random free space
+    const randomFreeSpace = freeSpaces[Math.floor(Math.random() * freeSpaces.length)];
+    console.log('generateObstructionCluster: ', randomFreeSpace)
+    const cluster = [new Obstruction(randomFreeSpace.x, randomFreeSpace.y)];
+    const offsetArray = [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+    for (let i = 0; i < 3; i++) {
+      const offset = offsetArray[Math.floor(Math.random() * offsetArray.length)];
+      const newX = randomFreeSpace.x + offset[0];
+      const newY = randomFreeSpace.y + offset[1];
+      const newPosition: Position = { x: newX, y: newY };
+      if (newX >= 0 && newX < this.width && newY >= 0 && newY < this.height &&
+          !blockedPositions?.some(position => position.x === newPosition.x && position.y === newPosition.y)) {
+        cluster.push(new Obstruction(newPosition.x, newPosition.y));
+      }
+    }
+
+    return cluster;
   }
 }
