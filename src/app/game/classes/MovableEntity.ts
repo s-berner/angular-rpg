@@ -2,10 +2,8 @@ import { ElementType } from "../enums/ElementType";
 import { Inputs } from "../enums/Inputs";
 import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
+import { Enemy } from "./Enemy";
 
-/** 
- * TODO: Check for collisions with other entities (enemies, items, walls, etc.)
- */
 export class MoveableEntity {
   outOfBoundsMsg = 'can\'t move out of bounds';
   readonly mapWidth = 10;
@@ -49,13 +47,11 @@ export class MoveableEntity {
     }
 
     // check if desired position is occupied
-    const blockedPositions = elements
-      .filter(element => element !== undefined)
-      .map(element => element?.getPosition()) as Position[];
+    const blockedPositions = this.getBlockedPositions(elements);
     const isOccupied = this.checkIfPosOccupied(desiredPos, blockedPositions);
     if(isOccupied) {
       // check what occupies the tile and handle each case accordingly
-      const occupant = elements.filter(element => {
+      let occupant = elements.filter(element => {
         const curPos = element?.getPosition()
         if (curPos) {
           return curPos.x === desiredPos.x && curPos.y === desiredPos.y;
@@ -73,18 +69,29 @@ export class MoveableEntity {
           }
           // TODO: init combat
           console.log('🔪 fighting', occupant.name, 'at', desiredPos, 'and won 🔪🩸');
-          elements = elements.filter(element => element?.name !== occupant.name);
+
+          // remove defeated enemy from elements 
+          function enemyTypeGuard(element: GameElement): element is Enemy {
+            return (element as Enemy).id !== undefined;
+          }
+
+          elements = elements.filter(element => {
+            if (enemyTypeGuard(element) && enemyTypeGuard(occupant)) {
+              return element.id !== occupant.id; // remove only the defeated enemy
+            }
+            return true; // keep all non-enemy elements
+          });
           break;
         case ElementType.Item:
           // TODO: pick up item
           console.log('can move, to', desiredPos, 'occupied by item');
           return elements;
-        case ElementType.Wall:
+        case ElementType.Obstruction:
           // cant move 
           if(myType === ElementType.Player) {
             // TODO: display message to player
           }
-          console.log('can\'t move, to', desiredPos, 'occupied by wall');
+          console.log('can\'t move, to', desiredPos, 'occupied by Obstruction');
           return elements;
         case ElementType.Player:
           // ? how do i want to handle if enemy wants to move into player
@@ -94,7 +101,7 @@ export class MoveableEntity {
             console.log('enemy can\'t move, to', desiredPos, 'occupied by exit');
             return elements;
           }
-          console.log('player can move, to', desiredPos, 'occupied by exit');
+          console.log('player reached the exit at', desiredPos, 'thus completing the stage 🎉');
           elements = elements.filter(element => element?.type === ElementType.Player);
           break;
         default:
@@ -105,7 +112,7 @@ export class MoveableEntity {
 
     // if move is valid and tile is not occupied move the entity
     this.x = desiredPos.x;
-    this.y = desiredPos.y;  
+    this.y = desiredPos.y;
     
     return elements;      
   }
@@ -121,5 +128,12 @@ export class MoveableEntity {
     });
 
     return occupied;
+  }
+
+  getBlockedPositions(elements: GameElement[]): Position[] {
+    const blockedPositions = elements
+      .filter(element => element !== undefined)
+      .map(element => element?.getPosition()) as Position[];
+    return blockedPositions;
   }
 }
