@@ -9,7 +9,6 @@ import { ElementType } from "../enums/ElementType";
 
 export class AngularRpg {
   player: Player;
-
   currentStage = 0;
   elements: GameElement[] = [];
       
@@ -19,15 +18,15 @@ export class AngularRpg {
     readonly width: number
   ) {
     // init player object
-    const playerPos = this.generateRandomPosition();
+    const playerPos = this.genRandomPos();
     this.player = new Player(playerName, playerPos.x, playerPos.y);
 
     // generate Game Elements
     this.generateElements();
   }
 
-  operateGame(direction: Inputs): void {
-    // handle the players move
+  operateGame(direction: Inputs): GameElement[] {
+    // handle the players move  
     this.elements = this.player.move(direction, this.elements, ElementType.Player);
 
     // if the player used the exit
@@ -37,7 +36,7 @@ export class AngularRpg {
     if(exitUsed) {
       this.currentStage++;
       this.generateElements();
-      return;
+      return this.elements; // ? maybe issue
     }
 
     // move each enemy
@@ -47,45 +46,55 @@ export class AngularRpg {
         enemy.randomMove(this.elements);
       }
     });
+
+    return this.elements;
   }
 
   initStage(): void {
     this.generateElements();
   }
 
+  clearElements(): void {
+    this.elements = [];
+  }
+
+  addElements(elements: GameElement[]): void {
+    this.elements.push(...elements);
+  }
+
   generateElements(): void {
     // ! player is persistent so they are not generated here
     // Clear game elements
-    this.elements = []; 
+    this.clearElements(); 
         
     // Add player
-    this.elements.push(this.player);
+    this.addElements([this.player]);
 
     // Generate obstructions
     for (let i = 0; i < 3; i++) {
-      this.elements.push(...this.generateObstructionCluster(this.elements.map(element => element?.getPosition()) as Position[]));
+      this.addElements(this.genObstrCluster(this.elements.map(element => element?.getPosition()) as Position[]));
     }
   
     // add exit
-    const exitPos = this.generateRandomPosition(this.elements.map(element => element?.getPosition()) as Position[]);
+    const exitPos = this.genRandomPos(this.elements.map(element => element?.getPosition()) as Position[]);
     const exit = new Exit(20, this.currentStage + 1, exitPos.x, exitPos.y);
-    this.elements.push(exit);
+    this.addElements([exit]);
 
     // Generate enemies
     // ? current stage is used to determine the number of enemies
     // ? i think stage + 1 is a good number
-    const enemies = this.generateEnemies(this.currentStage + 1);
-    this.elements.push(...enemies);
+    const enemies = this.genEnemies(this.currentStage + 1);
+    this.addElements(enemies);
 
     // TODO Generate items
     // ...
   }
 
-  generateEnemies(amount: number): Enemy[] {
+  genEnemies(amount: number): Enemy[] {
     const enemies: Enemy[] = [];
     const blockedPositions: Position[] = this.elements.map(element => element?.getPosition()) as Position[];
     for (let i = 0; i < amount; i++) {
-      const position = this.generateRandomPosition(blockedPositions);
+      const position = this.genRandomPos(blockedPositions);
       blockedPositions.push(position)
       const enemy = new Enemy('e' + i, '🧟', position.x, position.y);
       enemies.push(enemy);
@@ -93,14 +102,14 @@ export class AngularRpg {
     return enemies;
   }
 
-  generateRandomPosition(blockedPositions?: Position[]): Position {
+  genRandomPos(blockedPositions?: Position[]): Position {
     const randomX = Math.floor(Math.random() * this.width);
     const randomY = Math.floor(Math.random() * this.height);
     const position: Position = { x: randomX, y: randomY };
     if (blockedPositions) {
       const positionIsBlocked = blockedPositions.some(blockedPosition => blockedPosition.x === position.x && blockedPosition.y === position.y)
       if (positionIsBlocked) {
-        return this.generateRandomPosition(blockedPositions);
+        return this.genRandomPos(blockedPositions);
       } else {
         return position;
       }
@@ -109,7 +118,7 @@ export class AngularRpg {
     return position;
   }
 
-  generateObstructionCluster(blockedPositions?: Position[]): Obstruction[] {
+  genObstrCluster(blockedPositions?: Position[]): Obstruction[] {
     // look for cluster of free spaces
     const freeSpaces: Position[] = [];
     for (let y = 0; y < this.height; y++) {
@@ -133,7 +142,6 @@ export class AngularRpg {
 
     // pick a random free space
     const randomFreeSpace = freeSpaces[Math.floor(Math.random() * freeSpaces.length)];
-    console.log('generateObstructionCluster: ', randomFreeSpace)
     const cluster = [new Obstruction(randomFreeSpace.x, randomFreeSpace.y)];
     const offsetArray = [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1], [-1, -1], [1, -1], [-1, 1]];
     for (let i = 0; i < 3; i++) {
