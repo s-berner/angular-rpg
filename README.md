@@ -33,7 +33,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 	Verliert der Spieler seine Lebenspunkte ist das Spiel beendet.
 
 # to do for step #2
-- make enemies move ✅, adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
+- make enemies move ✅
+- adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
 or pick a direction and walk it until obstructed
 - combat view
 
