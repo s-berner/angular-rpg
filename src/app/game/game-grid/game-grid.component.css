@@ -5,7 +5,7 @@
     border: 3px ridge var(--secondary);
 }
 
-.grid-item {
+.grid-tile {
     width: 75px;
     height: 75px;
     background-color: var(--floor);
