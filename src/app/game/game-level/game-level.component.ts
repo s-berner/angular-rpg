@@ -8,45 +8,32 @@ import { Inputs } from '../enums/Inputs';
   styleUrls: ['./game-level.component.css']
 })
 export class GameLevelComponent implements OnInit {
-  game!: AngularRpg;
+  AngularRpg!: AngularRpg;
   @Output()htmlGrid: string[][] = [];
   
   ngOnInit(): void {
-    this.game = new AngularRpg('🧙', 10, 10);
-    this.htmlGrid = this.game.getFormattedGrid();
+    this.AngularRpg = new AngularRpg('🧙', 10, 10);
   }
 
   @HostListener('window:keydown', ['$event'])
   onKeypress(event: KeyboardEvent): void {
     switch(event.key) {
       case 'w':
-        this.game.operateGame(Inputs.Up);
-        break;
       case 'ArrowUp':
-        this.game.operateGame(Inputs.Up);
+        this.AngularRpg.operateGame(Inputs.Up);
         break;
       case 'a':
-        this.game.operateGame(Inputs.Left);
-        break;
       case 'ArrowLeft':
-        this.game.operateGame(Inputs.Left);
+        this.AngularRpg.operateGame(Inputs.Left);
         break;
       case 's':
-        this.game.operateGame(Inputs.Down);
-        break;
       case 'ArrowDown':
-        this.game.operateGame(Inputs.Down);
+        this.AngularRpg.operateGame(Inputs.Down);
         break;
       case 'd':
-        this.game.operateGame(Inputs.Right);
-        break;
       case 'ArrowRight':
-        this.game.operateGame(Inputs.Right);
+        this.AngularRpg.operateGame(Inputs.Right);
         break;
     }
-  
-    // TODO: make enemys move after player moves
-
-    this.htmlGrid = this.game.getFormattedGrid();
   }
 }
