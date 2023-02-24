@@ -5,17 +5,21 @@ import { GameLevelComponent } from './game-level/game-level.component';
 import { GameCombatComponent } from './game-combat/game-combat.component';
 import { GameViewComponent } from './game-view/game-view.component';
 import { GameGridComponent } from './game-grid/game-grid.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
     GameLevelComponent,
     GameCombatComponent,
     GameViewComponent,
-    GameGridComponent
+    GameGridComponent,
   ],
   imports: [
     CommonModule,
     AppRoutingModule,
+    MatProgressBarModule,
+    MatButtonModule,
   ]
 })
 export class GameModule { }
