@@ -1,13 +1,24 @@
+.container {
+  width: 80vw;
+}
+
 .top-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  gap: 10px;
+  margin-bottom: 150px;
+  margin-top: 50px
 }
 
 .bottom-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: var(--floor);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.hp-bar {
+  width: 200px;
+  margin-bottom: 20px;
 }

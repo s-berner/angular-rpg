@@ -1,15 +1,18 @@
 <div class="container">
   <div class="top-container">
     <div class="card-container player">
-      <img src="https://picsum.photos/300/500" alt="player">
+      <mat-progress-bar mode="determinate" [value]="test" color="accent" class="hp-bar"></mat-progress-bar>
+      <img src="../../../assets/images/player.png" alt="player" height="300px" width="250">
     </div>
     <div class="card-container enemy">
-      <img src="https://picsum.photos/300/500" alt="enemy">
+      <mat-progress-bar mode="determinate" value="100" color="warn" class="hp-bar"></mat-progress-bar>
+      <img src="../../../assets/images/enemy.png" alt="enemy" height="300px" width="250">
     </div>
   </div>
   <div class="bottom-container">
-    <div class="item-container">Items</div>
-    <div class="actions-container">Actions</div>
-    <div class="log-container">Combat log</div>
+    <div class="item-container">inventory</div>
+    <div class="actions-container">actions</div>
+    <div class="log-container">combat log</div>
+    <button mat-flat-button (click)="attack(10)">Take HP</button>
   </div>
 </div>

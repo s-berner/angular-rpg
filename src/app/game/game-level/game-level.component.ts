@@ -1,59 +1,70 @@
-import { Component, HostListener, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router, NavigationExtras, NavigationEnd } from '@angular/router';
 import { AngularRpg } from '../classes/AngularRpg';
 import { Inputs } from '../enums/Inputs';
 import { GameElement } from '../interfaces/GameElement';
-import { GameGridComponent } from '../game-grid/game-grid.component';
+import { Enemy } from '../classes/Enemy';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-game-level',
   templateUrl: './game-level.component.html',
   styleUrls: ['./game-level.component.css']
 })
-export class GameLevelComponent implements OnInit, OnChanges {
-  AngularRpg!: AngularRpg;
+export class GameLevelComponent implements OnInit {
+  angularRpg!: AngularRpg;
   gameElements: GameElement[] = [];
   gridWidth: number = 0;
   gridHeight: number = 0;
+
+  constructor(private router: Router) { }
   
   ngOnInit(): void {
-    this.AngularRpg = new AngularRpg('🧙', 10, 10);
-    this.gameElements = this.AngularRpg.elements;
-    this.gridWidth = this.AngularRpg.width;
-    this.gridHeight = this.AngularRpg.height;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('ngOnChanges in game-level.component.ts');
+    this.angularRpg = new AngularRpg('🧙', 10, 10);
+    this.gameElements = this.angularRpg.elements;
+    this.gridWidth = this.angularRpg.width;
+    this.gridHeight = this.angularRpg.height;
   }
 
   @HostListener('window:keydown', ['$event'])
   onKeypress(event: KeyboardEvent): void {
-    let updatedElements: GameElement[] = [];
     switch(event.key) {
       case 'w':
-        case 'ArrowUp':
-        updatedElements = this.AngularRpg.operateGame(Inputs.Up);
+      case 'ArrowUp':
+        this.gameElements = this.angularRpg.operateGame(Inputs.Up);
         break;
-        case 'a':
-          case 'ArrowLeft':
-        updatedElements = this.AngularRpg.operateGame(Inputs.Left);
+      case 'a':
+      case 'ArrowLeft':
+        this.gameElements = this.angularRpg.operateGame(Inputs.Left);
         break;
-        case 's':
+      case 's':
       case 'ArrowDown':
-        updatedElements = this.AngularRpg.operateGame(Inputs.Down);
+        this.gameElements = this.angularRpg.operateGame(Inputs.Down);
         break;
       case 'd':
       case 'ArrowRight':
-        updatedElements = this.AngularRpg.operateGame(Inputs.Right);
+        this.gameElements = this.angularRpg.operateGame(Inputs.Right);
         break;
-      }
+    }
 
-      
-      let newElementsArray: GameElement[] = [];
-      updatedElements.forEach((element: GameElement) => {
-        newElementsArray.push(element);
-      });
+    if(this.angularRpg.player.initiateCombat) {
+      this.goToCombat();
+      this.angularRpg.player.initiateCombat = false;
+    }
 
-      this.gameElements = newElementsArray ;
+    let newElementsArray: GameElement[] = [];
+    this.gameElements.forEach((element: GameElement) => {
+      newElementsArray.push(element);
+    });
+    this.gameElements = newElementsArray;
+  }
+
+  goToCombat(): void {
+    const dataToPass = {
+      player: JSON.stringify(this.angularRpg.player),
+      enemy: JSON.stringify(this.angularRpg.opponent),
+    };
+
+    this.router.navigate(['/game/combat'], {queryParams: dataToPass});
   }
 }
