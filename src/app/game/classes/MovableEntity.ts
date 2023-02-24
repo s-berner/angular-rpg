@@ -7,7 +7,7 @@ import { Player } from "./Player";
 
 export class MoveableEntity {
   initiateCombat = false;
-  enemy?: Enemy | Player;
+  enemy?: Enemy;
   readonly mapWidth = 10;
   readonly mapHeight = 10;
   constructor (

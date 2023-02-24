@@ -9,7 +9,7 @@ import { ElementType } from "../enums/ElementType";
 
 export class AngularRpg {
   player: Player;
-  opponent?: Enemy | Player;
+  opponent?: Enemy;
   currentStage = 0;
   elements: GameElement[] = [];
       

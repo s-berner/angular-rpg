@@ -1,14 +1,15 @@
 import { MoveableEntity } from './MovableEntity';
+import { Combatant } from '../interfaces/Combatant';
 import { Item } from './Item';
 import { Inputs } from '../enums/Inputs';
 import { ElementType } from '../enums/ElementType';
 import { GameElement } from '../interfaces/GameElement';
 import { Position } from '../interfaces/Position';
 
-export class Enemy extends MoveableEntity {
+export class Enemy extends MoveableEntity implements Combatant {
   maxHealth = 10;
   currentHealth = this.maxHealth;
-  attributes = { strength: 5, armor: 10, agility: 10 };
+  attributes = { strength: 10, armor: 3, evasion: 0.1 };
   inventory: Item[] = [];
   readonly type = ElementType.Enemy;
   private target?: Position;
@@ -23,25 +24,6 @@ export class Enemy extends MoveableEntity {
     
   randomMove(elements: GameElement[]): void {
     this.walkToTarget(elements);
-  /*   const direction = Math.floor(Math.random() * 4);
-    let input = Inputs.None;
-    switch (direction) {
-      case 0:
-        input = Inputs.Down;
-        break;
-      case 1:
-        input = Inputs.Up;
-        break;
-      case 2:
-        input = Inputs.Left;
-        break;
-      case 3:
-        input = Inputs.Right;
-        break;
-      default:
-        input = Inputs.None;
-    }
-    this.move(input, elements, this.type); */
   }
 
   findPathToTarget(target: Position, blockedPositions: Position[]): Inputs[] {
@@ -97,5 +79,33 @@ export class Enemy extends MoveableEntity {
         this.move(nextStep, elements, this.type);
       }
     }
+  }
+
+  attack(target: Combatant): number {
+    // check if attack hits
+    const miss = !(Math.random() > target.attributes.evasion);
+    if (miss) {
+      return 0;
+    }
+    const damage = this.attributes.strength - target.attributes.armor;
+    target.currentHealth -= damage;
+    
+    return damage;
+  }
+
+  takeDamage(damage: number): void {
+    this.currentHealth -= damage;
+  }
+
+  heal(amount: number): void {
+    this.currentHealth += amount;
+    // prevent overhealing
+    if (this.currentHealth > this.maxHealth) {
+      this.currentHealth = this.maxHealth;
+    }
+  }
+
+  isDead(): boolean {
+    return this.currentHealth <= 0;
   }
 }

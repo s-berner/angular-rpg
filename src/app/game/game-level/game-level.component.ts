@@ -5,6 +5,7 @@ import { Inputs } from '../enums/Inputs';
 import { GameElement } from '../interfaces/GameElement';
 import { Enemy } from '../classes/Enemy';
 import { filter, map } from 'rxjs/operators';
+import { CombatService } from '../combat.service';
 
 @Component({
   selector: 'app-game-level',
@@ -17,7 +18,10 @@ export class GameLevelComponent implements OnInit {
   gridWidth: number = 0;
   gridHeight: number = 0;
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private combatService: CombatService,
+  ) { }
   
   ngOnInit(): void {
     this.angularRpg = new AngularRpg('🧙', 10, 10);
@@ -60,11 +64,8 @@ export class GameLevelComponent implements OnInit {
   }
 
   goToCombat(): void {
-    const dataToPass = {
-      player: JSON.stringify(this.angularRpg.player),
-      enemy: JSON.stringify(this.angularRpg.opponent),
-    };
-
-    this.router.navigate(['/game/combat'], {queryParams: dataToPass});
+    this.combatService.setPlayer(this.angularRpg.player);
+    this.combatService.setEnemy(this.angularRpg.opponent);
+    this.router.navigate(['/game/combat']);
   }
 }
