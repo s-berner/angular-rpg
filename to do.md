@@ -34,12 +34,16 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 # to do for step #2
 - make enemies move ✅
-- adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
-or pick a direction and walk it until obstructed
-- combat view
+- combat view basic setup ✅
+- develop a service that passes my data, passing in router no bueno
+- think of attacks, spells for player and enemy
 
 # misc
+- adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
+or pick a direction and walk it until obstructed
 - make player also spawn randomly ✅
 - fix enemy stacking ✅
 - fix that enemies can walk onto the door ✅
 - add tree clusters as obstruction
+- make combat log a message log component
+
