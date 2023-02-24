@@ -9,6 +9,7 @@ import { ElementType } from "../enums/ElementType";
 
 export class AngularRpg {
   player: Player;
+  opponent?: Enemy | Player;
   currentStage = 0;
   elements: GameElement[] = [];
       
@@ -28,6 +29,12 @@ export class AngularRpg {
   operateGame(direction: Inputs): GameElement[] {
     // handle the players move  
     this.elements = this.player.move(direction, this.elements, ElementType.Player);
+
+    // check if the player walked into an enemy
+    if(this.player.initiateCombat) {
+      console.log('go to combat screen')
+      this.opponent = this.player.enemy;
+    }
 
     // if the player used the exit
     // TODO: check if the player is on the exit
