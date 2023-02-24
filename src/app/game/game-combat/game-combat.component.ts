@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
 
@@ -12,22 +12,41 @@ import { MatButton } from '@angular/material/button';
 export class GameCombatComponent implements OnInit {
   player!: any;
   enemy!: any;
-  test = 100;
+  playerHP = 0;
+  enemyHP = 0;
+  combatLog: string[] = ['You encounter a wild forest zombie!',];
   
   constructor(
     private route: ActivatedRoute,
-    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.player = JSON.parse(params['player']);
       this.enemy = JSON.parse(params['enemy']);
-      this.player.currentHealth = 5;
+      this.playerHP = this.calcPercentage(Number(this.player.currentHealth), Number(this.player.maxHealth));
+      this.enemyHP = this.calcPercentage(Number(this.enemy.currentHealth), Number(this.enemy.maxHealth));
     });
   }
 
-  attack(dmg: number): void {
-    this.test -= dmg;
+  calcPercentage(health: number, maxHealth: number): number {
+    return (health / maxHealth) * 100;
   }
+
+  stealHp(amount: number): void {
+    this.enemyHP -= amount;
+    this.playerHP += amount;
+    this.combatLog.push('You steal ' + amount + ' health from the enemy!');
+  }
+
+  attack(amount: number): void {
+    this.enemyHP -= amount;
+    this.combatLog.push('You attack the enemy for ' + amount + ' damage!');
+  }
+
+  takeDmg(amount: number): void {
+    this.playerHP -= amount;
+    this.combatLog.push('You take ' + amount + ' damage!');
+  }
+
 }

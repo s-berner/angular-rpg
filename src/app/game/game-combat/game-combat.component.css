@@ -10,15 +10,34 @@
 }
 
 .bottom-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
   background-color: var(--floor);
   padding: 20px;
   border-radius: 10px;
+  height: 250px;
 }
 
 .hp-bar {
-  width: 200px;
+  width: 250px;
   margin-bottom: 20px;
+}
+
+.actions-container {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.combat-log {
+  overflow: auto;
+  max-height: 200px;
+}
+
+.combat-log-item {
+  font-family: 'Press Start 2P', cursive;
+  max-height: 25px;
+  padding-left: 0;
 }
