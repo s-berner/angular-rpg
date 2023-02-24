@@ -3,9 +3,11 @@ import { Inputs } from "../enums/Inputs";
 import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
 import { Enemy } from "./Enemy";
+import { Player } from "./Player";
 
 export class MoveableEntity {
-  outOfBoundsMsg = 'can\'t move out of bounds';
+  initiateCombat = false;
+  enemy?: Enemy | Player;
   readonly mapWidth = 10;
   readonly mapHeight = 10;
   constructor (
@@ -42,7 +44,7 @@ export class MoveableEntity {
     const outOfBounds = this.checkIfOutOfBounds(desiredPos);
     if (outOfBounds) {
       // TODO: display message to user
-      console.log(this.outOfBoundsMsg);
+      console.log('can\'t move out of bounds');
       return elements;
     }
 
@@ -68,19 +70,21 @@ export class MoveableEntity {
             return elements;
           }
           // TODO: init combat
-          console.log('🔪 fighting', occupant.name, 'at', desiredPos, 'and won 🔪🩸');
+          console.log('🔪 fighting', occupant.name, 'at', desiredPos);
 
-          // remove defeated enemy from elements 
+          // remove  enemy from elements and set initiateCombat to true
           function enemyTypeGuard(element: GameElement): element is Enemy {
             return (element as Enemy).id !== undefined;
           }
 
           elements = elements.filter(element => {
             if (enemyTypeGuard(element) && enemyTypeGuard(occupant)) {
+              this.enemy = occupant; // set enemy to be used in combat
               return element.id !== occupant.id; // remove only the defeated enemy
             }
             return true; // keep all non-enemy elements
           });
+          this.initiateCombat = true;
           break;
         case ElementType.Item:
           // TODO: pick up item

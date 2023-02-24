@@ -82,10 +82,6 @@ export class Enemy extends MoveableEntity {
   }
 
   walkToTarget(elements: GameElement[]): void {
-    /* 
-      * if target not set or arrived at target
-      * find new target and path 
-    */
     const currentPos = this.getPosition();
     const targetNotSet = this.target === undefined;
     const arrivedAtTarget = this.target && this.target.x === currentPos.x && this.target.y === currentPos.y;
@@ -93,7 +89,6 @@ export class Enemy extends MoveableEntity {
       this.target = this.findTarget(elements);
       this.path = this.findPathToTarget(this.target, this.getBlockedPositions(elements));
     }
-    console.log('walking to target', this.target);
 
     // walk along path
     if (this.path && this.path.length > 0) {
