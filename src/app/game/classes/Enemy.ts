@@ -11,13 +11,13 @@ export class Enemy extends MoveableEntity implements Combatant {
   currentHealth = this.maxHealth;
   attributes = { strength: 10, armor: 3, evasion: 0.1 };
   inventory: Item[] = [];
+  readonly display = '🧟';
   readonly type = ElementType.Enemy;
   private target?: Position;
   private path?: Inputs[];
 
   constructor (
     readonly id: string,
-    public name: string,
     x: number,
     y: number,
   ) { super(x, y); }

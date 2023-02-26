@@ -2,6 +2,7 @@ import { Position } from "../interfaces/Position";
 import { ElementType } from "../enums/ElementType";
 
 export class Item {
+  readonly display = '🗡';
   readonly type = ElementType.Item;
   readonly position: { x: number, y: number };
   constructor(

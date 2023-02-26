@@ -10,6 +10,7 @@ export class Player extends MoveableEntity implements Combatant {
   currentHealth = this.maxHealth;
   attributes = { strength: 10, armor: 5, evasion: 0.1 };
   inventory: Item[] = [];
+  readonly display = '🧙‍♂️';
   readonly type = ElementType.Player;
 
   constructor (
