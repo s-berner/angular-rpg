@@ -1,11 +1,13 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, NavigationExtras, NavigationEnd } from '@angular/router';
-import { AngularRpg } from '../classes/AngularRpg';
-import { Inputs } from '../enums/Inputs';
-import { GameElement } from '../interfaces/GameElement';
-import { Enemy } from '../classes/Enemy';
+
 import { filter, map } from 'rxjs/operators';
+
+import { AngularRpg } from '../classes/AngularRpg';
+import { GameElement } from '../interfaces/GameElement';
+import { Inputs } from '../enums/Inputs';
 import { CombatService } from '../combat.service';
+import { AngularRpgService } from '../angular-rpg.service';
 
 @Component({
   selector: 'app-game-level',
@@ -21,10 +23,11 @@ export class GameLevelComponent implements OnInit {
   constructor(
     private router: Router,
     private combatService: CombatService,
+    private angularRpgService: AngularRpgService
   ) { }
   
   ngOnInit(): void {
-    this.angularRpg = new AngularRpg('🧙', 10, 10);
+    this.angularRpg = this.angularRpgService.getAngularRpg();
     this.gameElements = this.angularRpg.elements;
     this.gridWidth = this.angularRpg.width;
     this.gridHeight = this.angularRpg.height;

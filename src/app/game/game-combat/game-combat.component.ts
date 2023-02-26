@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
+
+import { Subscription } from 'rxjs';
+
 import { CombatService } from '../combat.service';
 import { Enemy } from '../classes/Enemy';
 import { Player } from '../classes/Player';
@@ -12,9 +15,11 @@ import { Player } from '../classes/Player';
   templateUrl: './game-combat.component.html',
   styleUrls: ['./game-combat.component.css']
 })
-export class GameCombatComponent implements OnInit {
-  player!: Player;
-  enemy!: Enemy;
+export class GameCombatComponent implements OnInit, OnDestroy {
+  playerSubscription?: Subscription;
+  enemySubscription?: Subscription;
+  player?: Player;
+  enemy?: Enemy;
   playerHealthBarPercent = 0;
   enemyHealthBarPercent = 0;
   combatLog: string[] = ['You encounter a wild forest zombie!',];
@@ -25,14 +30,14 @@ export class GameCombatComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.combatService.player.subscribe(player => {
+    this.playerSubscription = this.combatService.player.subscribe(player => {
       if (player) {
         this.player = player as Player;
         this.playerHealthBarPercent = this.calcPercentage(this.player.currentHealth, this.player.maxHealth);
       }
     });
 
-    this.combatService.enemy.subscribe(enemy => {
+    this.enemySubscription = this.combatService.enemy.subscribe(enemy => {
       if (enemy) {
         this.enemy = enemy as Enemy
         this.enemyHealthBarPercent = this.calcPercentage(this.enemy.currentHealth, this.enemy.maxHealth);
@@ -40,58 +45,93 @@ export class GameCombatComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    if (this.playerSubscription) {
+      this.playerSubscription.unsubscribe();
+    }
+    if (this.enemySubscription) {
+      this.enemySubscription.unsubscribe();
+    }
+  }
+
   calcPercentage(health: number, maxHealth: number): number {
     return (health / maxHealth) * 100;
   }
 
   onPlayerAttacks(): void {
-    const calculatedDmg = this.player.attack(this.enemy);
-    if (calculatedDmg === 0) {
-      this.combatLog.push(`You miss the ${this.enemy.name}!`);
+    if (!this.player || !this.enemy) {
       return;
     }
-    this.combatLog.push(`You attack the ${this.enemy.name} for ${calculatedDmg} damage!`);
+
+    const calculatedDmg = this.player.attack(this.enemy);
+    if (calculatedDmg === 0) {
+      this.combatLog.push(`You miss the ${this.enemy.display}!`);
+      return this.onEnemyAttacks();
+    }
+    this.combatLog.push(`You attack the ${this.enemy.display} for ${calculatedDmg} damage!`);
 
     if(this.enemy.currentHealth <= 0) {
-      this.combatLog.push(`You have defeated the ${this.enemy.name}!`);
+      this.combatLog.push(`You have defeated the ${this.enemy.display}!`);
       // TODO: Add logic to handle enemy death
     }
     this.updateEnemyHealthBar();
 
     // handle enemy death
-    if (this.enemy.isDead()) {
-      this.combatLog.push(`You have defeated the ${this.enemy.name}!`);
+    if (this.checkIfEnemyIsDead()) {
+      this.combatLog.push(`You have defeated the ${this.enemy.display}!`);
       // TODO: Add logic to handle enemy death (loot, exp, etc.)
       // for now just go back to game level
       this.goToGameLevel();
     }
+
+    // enemys turn
+    return this.onEnemyAttacks();
   }
 
   onPlayerStealsHealth(): void {
+    if (!this.player || !this.enemy) {
+      return;
+    }
+
     const calculatedStolenHp = this.player.attack(this.enemy);
     if (calculatedStolenHp === 0) {
-      this.combatLog.push(`You miss the ${this.enemy.name}!`);
-      return;
+      this.combatLog.push(`You miss the ${this.enemy.display}!`);
+      return this.onEnemyAttacks();
     }
     this.player.heal(calculatedStolenHp);
     this.updatePlayerHealthBar();
     this.updateEnemyHealthBar();
-    this.combatLog.push(`You steal ${calculatedStolenHp} HP from ${this.enemy.name}!`);
+    this.combatLog.push(`You steal ${calculatedStolenHp} HP from ${this.enemy.display}!`);
+
+    // handle enemy death
+    if (this.checkIfEnemyIsDead()) {
+      this.combatLog.push(`You have defeated the ${this.enemy.display}!`);
+      //TODO: Add logic to handle enemy death (loot, exp, etc.)
+      // for now just go back to game level
+      this.goToGameLevel();
+    }
+
+    // enemys turn
+    return this.onEnemyAttacks();
   }
   
   onEnemyAttacks(): void {
-    const calculatedDmg = this.enemy.attack(this.player);
-    if (calculatedDmg === 0) {
-      this.combatLog.push(`The ${this.enemy.name} misses you!`);
+    if (!this.player || !this.enemy) {
       return;
     }
-    this.combatLog.push(`The ${this.enemy.name} attacks you for ${calculatedDmg} damage!`);
+
+    const calculatedDmg = this.enemy.attack(this.player);
+    if (calculatedDmg === 0) {
+      this.combatLog.push(`The ${this.enemy.display} misses you!`);
+      return this.onEnemyAttacks();
+    }
+    this.combatLog.push(`The ${this.enemy.display} attacks you for ${calculatedDmg} damage!`);
     
     this.updatePlayerHealthBar();
 
     // handle player death
-    if (this.player.isDead()) {
-      this.combatLog.push(`You have been defeated by ${this.enemy.name}!`)
+    if (this.checkIfPlayerIsDead()) {
+      this.combatLog.push(`You have been defeated by ${this.enemy.display}!`)
       // TODO: Add logic to handle player death
     }
   }
@@ -113,10 +153,36 @@ export class GameCombatComponent implements OnInit {
   }
 
   updatePlayerHealthBar(): void {
+    if (!this.player || !this.enemy) {
+      return;
+    }
+
     this.playerHealthBarPercent = this.calcPercentage(this.player.currentHealth, this.player.maxHealth);
   }
   
   updateEnemyHealthBar(): void {
+    if (!this.player || !this.enemy) {
+      return;
+    }
     this.enemyHealthBarPercent = this.calcPercentage(this.enemy.currentHealth, this.enemy.maxHealth);
+  }
+
+  checkIfPlayerIsDead(): boolean {
+    if (!this.player || !this.enemy) {
+      return true;
+    }
+    return this.player.isDead();
+  }
+
+  checkIfEnemyIsDead(): boolean {
+    if (!this.player || !this.enemy) {
+      return true;
+    }
+
+    return this.enemy.isDead();
+  }
+
+  onReset(): void {
+    this.router.navigate(['/game/level']);
   }
 }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SharedDataService } from '../shared-data.service';
 
 @Component({
   selector: 'app-welcome-screen',
@@ -7,9 +8,9 @@ import { Component } from '@angular/core';
 })
 export class WelcomeScreenComponent {
   playerName = '';
-  constructor() { }
+  constructor(private sharedDataService: SharedDataService) { }
 
-  test() {
-    console.log(this.playerName);
+  onStartJourneyClicked() {
+    this.sharedDataService.setPlayerName(this.playerName);
   }
 }

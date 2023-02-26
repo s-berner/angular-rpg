@@ -27,4 +27,9 @@
     </div>
   </div>
 </div>
-<ng-template #elseBlock>Something went wrong...</ng-template>
+<ng-template #elseBlock>
+  <div style="display: flex; flex-direction: column; gap: .5rem;">
+    <div>Player or Enemy not found...</div>
+    <button mat-raised-button color="accent" (click)="onReset()">Reset</button>
+  </div>
+</ng-template>

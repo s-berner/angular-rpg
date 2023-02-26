@@ -30,9 +30,10 @@ export class AngularRpg {
     // handle the players move  
     this.elements = this.player.move(direction, this.elements, ElementType.Player);
 
+    // ! enemy is removed from the elements array when player walks into it !
+
     // check if the player walked into an enemy
     if(this.player.initiateCombat) {
-      console.log('go to combat screen')
       this.opponent = this.player.enemy;
     }
 
@@ -55,10 +56,6 @@ export class AngularRpg {
     });
 
     return this.elements;
-  }
-
-  initStage(): void {
-    this.generateElements();
   }
 
   clearElements(): void {
@@ -103,7 +100,7 @@ export class AngularRpg {
     for (let i = 0; i < amount; i++) {
       const position = this.genRandomPos(blockedPositions);
       blockedPositions.push(position)
-      const enemy = new Enemy('e' + i, '🧟', position.x, position.y);
+      const enemy = new Enemy('e' + i, position.x, position.y);
       enemies.push(enemy);
     }
     return enemies;

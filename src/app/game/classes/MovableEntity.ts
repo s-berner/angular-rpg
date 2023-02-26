@@ -44,7 +44,6 @@ export class MoveableEntity {
     const outOfBounds = this.checkIfOutOfBounds(desiredPos);
     if (outOfBounds) {
       // TODO: display message to user
-      console.log('can\'t move out of bounds');
       return elements;
     }
 
@@ -66,11 +65,8 @@ export class MoveableEntity {
         case ElementType.Enemy:
           // prevent enemies stacking in same tile
           if (myType === ElementType.Enemy) {
-            console.log('can\'t move, to', desiredPos, 'occupied by enemy');
             return elements;
           }
-          // TODO: init combat
-          console.log('🔪 fighting', occupant.name, 'at', desiredPos);
 
           // remove  enemy from elements and set initiateCombat to true
           function enemyTypeGuard(element: GameElement): element is Enemy {
@@ -88,24 +84,20 @@ export class MoveableEntity {
           break;
         case ElementType.Item:
           // TODO: pick up item
-          console.log('can move, to', desiredPos, 'occupied by item');
           return elements;
         case ElementType.Obstruction:
           // cant move 
           if(myType === ElementType.Player) {
             // TODO: display message to player
           }
-          console.log('can\'t move, to', desiredPos, 'occupied by Obstruction');
           return elements;
         case ElementType.Player:
           // ? how do i want to handle if enemy wants to move into player
           return elements;
         case ElementType.Exit:
           if(myType === ElementType.Enemy) {
-            console.log('enemy can\'t move, to', desiredPos, 'occupied by exit');
             return elements;
           }
-          console.log('player reached the exit at', desiredPos, 'thus completing the stage 🎉');
           elements = elements.filter(element => element?.type === ElementType.Player);
           break;
         default:
