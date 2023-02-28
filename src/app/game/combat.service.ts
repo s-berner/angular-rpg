@@ -13,10 +13,8 @@ import { GameElement } from './interfaces/GameElement';
 export class CombatService {
   private playerSource = new BehaviorSubject<Player | null>(null);
   private enemySource = new BehaviorSubject<Enemy | null>(null);
-  private gameElementsSource = new BehaviorSubject<GameElement[]>([]);
   player = this.playerSource.asObservable();
   enemy = this.enemySource.asObservable();
-  gameElements = this.gameElementsSource.asObservable();
 
 
   constructor() { }
@@ -31,10 +29,6 @@ export class CombatService {
     }
   }
 
-  setGameElements(gameElements: GameElement[]) {
-    this.gameElementsSource.next(gameElements);
-  }
-
   getPlayer(): Player | null {
     return this.playerSource.getValue();
   }
@@ -43,7 +37,11 @@ export class CombatService {
     return this.enemySource.getValue();
   }
 
-  getGameElements(): GameElement[] {
-    return this.gameElementsSource.getValue();
+  clearPlayer() {
+    this.playerSource.next(null);
+  }
+
+  clearEnemy() {
+    this.enemySource.next(null);
   }
 }
