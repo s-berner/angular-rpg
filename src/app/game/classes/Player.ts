@@ -6,7 +6,7 @@ import { Combatant } from '../interfaces/Combatant';
 export class Player extends MoveableEntity implements Combatant {
   level = 1;
   experience = 0;
-  maxHealth = 10;
+  maxHealth = 100;
   currentHealth = this.maxHealth;
   attributes = { strength: 10, armor: 5, evasion: 0.1 };
   inventory: Item[] = [];

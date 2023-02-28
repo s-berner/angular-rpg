@@ -6,8 +6,6 @@ import { Enemy } from "./Enemy";
 import { Player } from "./Player";
 
 export class MoveableEntity {
-  initiateCombat = false;
-  enemy?: Enemy;
   readonly mapWidth = 10;
   readonly mapHeight = 10;
   constructor (
@@ -67,24 +65,10 @@ export class MoveableEntity {
           if (myType === ElementType.Enemy) {
             return elements;
           }
-
-          // remove  enemy from elements and set initiateCombat to true
-          function enemyTypeGuard(element: GameElement): element is Enemy {
-            return (element as Enemy).id !== undefined;
-          }
-
-          elements = elements.filter(element => {
-            if (enemyTypeGuard(element) && enemyTypeGuard(occupant)) {
-              this.enemy = occupant; // set enemy to be used in combat
-              return element.id !== occupant.id; // remove only the defeated enemy
-            }
-            return true; // keep all non-enemy elements
-          });
-          this.initiateCombat = true;
           break;
         case ElementType.Item:
           // TODO: pick up item
-          return elements;
+          break;
         case ElementType.Obstruction:
           // cant move 
           if(myType === ElementType.Player) {
@@ -98,7 +82,6 @@ export class MoveableEntity {
           if(myType === ElementType.Enemy) {
             return elements;
           }
-          elements = elements.filter(element => element?.type === ElementType.Player);
           break;
         default:
           // case that would go here is ElementType.Empty or undefined?

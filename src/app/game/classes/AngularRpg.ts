@@ -12,10 +12,10 @@ export class AngularRpg {
   opponent?: Enemy;
   currentStage = 0;
   elements: GameElement[] = [];
-      
+
   constructor(
-    playerName: string, 
-    readonly height: number, 
+    playerName: string,
+    readonly height: number,
     readonly width: number
   ) {
     // init player object
@@ -27,24 +27,54 @@ export class AngularRpg {
   }
 
   operateGame(direction: Inputs): GameElement[] {
-    // handle the players move  
+    // handle the players move
     this.elements = this.player.move(direction, this.elements, ElementType.Player);
 
-    // ! enemy is removed from the elements array when player walks into it !
 
-    // check if the player walked into an enemy
-    if(this.player.initiateCombat) {
-      this.opponent = this.player.enemy;
+    // check if the player is on an enemy
+    const playerOnTileWithEnemy = this.elements.some(element => {
+      const curPos = element?.getPosition();
+      const playerPos = this.player.getPosition();
+      if (curPos && element?.type === ElementType.Enemy) {
+        const onSameTile = curPos.x === playerPos.x && curPos.y === playerPos.y;
+        if (onSameTile) {
+          this.opponent = element as Enemy;
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (playerOnTileWithEnemy) {
+      // filter out the enemy
+      console.log('enemy to be removed has id:', this.opponent?.id)
+      this.elements = this.elements.filter(element => {
+        if (element.type === ElementType.Enemy) {
+          const curId = element?.id;
+          if (curId && curId === this.opponent?.id) {
+            console.log('removing enemy with id:', curId)
+            return false;
+          }
+        }
+        return true;
+      });
+
+      console.log('enemies after removal:', this.elements)
     }
 
-    // if the player used the exit
-    // TODO: check if the player is on the exit
-    const exitUsed = !this.elements.some(element => element?.type === ElementType.Exit);
-
-    if(exitUsed) {
+    // if the player is on the exit
+    const playerOnExit = this.elements.some(element => {
+      const curPos = element?.getPosition();
+      const playerPos = this.player.getPosition();
+      if (curPos && element?.type === ElementType.Exit) {
+        return curPos.x === playerPos.x && curPos.y === playerPos.y;
+      }
+      return false;
+    });
+    if (playerOnExit) {
       this.currentStage++;
       this.generateElements();
-      return this.elements; // ? maybe issue
+      return this.elements;
     }
 
     // move each enemy
@@ -69,8 +99,8 @@ export class AngularRpg {
   generateElements(): void {
     // ! player is persistent so they are not generated here
     // Clear game elements
-    this.clearElements(); 
-        
+    this.clearElements();
+
     // Add player
     this.addElements([this.player]);
 
@@ -78,7 +108,7 @@ export class AngularRpg {
     for (let i = 0; i < 3; i++) {
       this.addElements(this.genObstrCluster(this.elements.map(element => element?.getPosition()) as Position[]));
     }
-  
+
     // add exit
     const exitPos = this.genRandomPos(this.elements.map(element => element?.getPosition()) as Position[]);
     const exit = new Exit(20, this.currentStage + 1, exitPos.x, exitPos.y);
@@ -99,10 +129,11 @@ export class AngularRpg {
     const blockedPositions: Position[] = this.elements.map(element => element?.getPosition()) as Position[];
     for (let i = 0; i < amount; i++) {
       const position = this.genRandomPos(blockedPositions);
-      blockedPositions.push(position)
-      const enemy = new Enemy('e' + i, position.x, position.y);
+      blockedPositions.push(position);
+      const enemy = new Enemy('enemy' + i, position.x, position.y);
       enemies.push(enemy);
     }
+
     return enemies;
   }
 
@@ -117,8 +148,8 @@ export class AngularRpg {
       } else {
         return position;
       }
-    } 
-    
+    }
+
     return position;
   }
 
