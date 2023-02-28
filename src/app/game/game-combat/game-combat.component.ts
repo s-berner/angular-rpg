@@ -23,13 +23,14 @@ export class GameCombatComponent implements OnInit, OnDestroy {
   playerHealthBarPercent = 0;
   enemyHealthBarPercent = 0;
   combatLog: string[] = ['You encounter a wild forest zombie!',];
-  
+
   constructor(
     private router: Router,
     private combatService: CombatService,
   ) { }
 
   ngOnInit(): void {
+    console.log('ngOnInit() called in game-combat.component.ts');
     this.playerSubscription = this.combatService.player.subscribe(player => {
       if (player) {
         this.player = player as Player;
@@ -43,14 +44,17 @@ export class GameCombatComponent implements OnInit, OnDestroy {
         this.enemyHealthBarPercent = this.calcPercentage(this.enemy.currentHealth, this.enemy.maxHealth);
       }
     });
+
   }
 
   ngOnDestroy(): void {
+    console.log('ngOnDestroy() called in game-combat.component.ts');
     if (this.playerSubscription) {
       this.playerSubscription.unsubscribe();
     }
     if (this.enemySubscription) {
       this.enemySubscription.unsubscribe();
+      this.combatService.clearEnemy();
     }
   }
 
@@ -68,20 +72,17 @@ export class GameCombatComponent implements OnInit, OnDestroy {
       this.combatLog.push(`You miss the ${this.enemy.display}!`);
       return this.onEnemyAttacks();
     }
-    this.combatLog.push(`You attack the ${this.enemy.display} for ${calculatedDmg} damage!`);
-
-    if(this.enemy.currentHealth <= 0) {
-      this.combatLog.push(`You have defeated the ${this.enemy.display}!`);
-      // TODO: Add logic to handle enemy death
-    }
     this.updateEnemyHealthBar();
+    this.combatLog.push(`You attack the ${this.enemy.display} for ${calculatedDmg} damage!`);
 
     // handle enemy death
     if (this.checkIfEnemyIsDead()) {
       this.combatLog.push(`You have defeated the ${this.enemy.display}!`);
-      // TODO: Add logic to handle enemy death (loot, exp, etc.)
-      // for now just go back to game level
-      this.goToGameLevel();
+      /*
+        TODO: Add logic to handle enemy death (loot, exp, etc.)
+        for now just go back to game-level
+      */
+      return this.goToGameLevel();
     }
 
     // enemys turn
@@ -108,13 +109,13 @@ export class GameCombatComponent implements OnInit, OnDestroy {
       this.combatLog.push(`You have defeated the ${this.enemy.display}!`);
       //TODO: Add logic to handle enemy death (loot, exp, etc.)
       // for now just go back to game level
-      this.goToGameLevel();
+      return this.goToGameLevel();
     }
 
     // enemys turn
     return this.onEnemyAttacks();
   }
-  
+
   onEnemyAttacks(): void {
     if (!this.player || !this.enemy) {
       return;
@@ -123,10 +124,10 @@ export class GameCombatComponent implements OnInit, OnDestroy {
     const calculatedDmg = this.enemy.attack(this.player);
     if (calculatedDmg === 0) {
       this.combatLog.push(`The ${this.enemy.display} misses you!`);
-      return this.onEnemyAttacks();
+      return;
     }
     this.combatLog.push(`The ${this.enemy.display} attacks you for ${calculatedDmg} damage!`);
-    
+
     this.updatePlayerHealthBar();
 
     // handle player death
@@ -135,7 +136,7 @@ export class GameCombatComponent implements OnInit, OnDestroy {
       // TODO: Add logic to handle player death
     }
   }
-  
+
   onPlayerFlees(): void {
     // TODO: Add logic to handle player fleeing
   }
@@ -143,11 +144,11 @@ export class GameCombatComponent implements OnInit, OnDestroy {
   onItemUsed(): void {
     // TODO: Add logic to handle item use
   }
-  
+
   goToGameLevel(): void {
     this.router.navigate(['/game/level']);
   }
-  
+
   goToWelcome(): void {
     this.router.navigate(['/']);
   }
@@ -159,7 +160,7 @@ export class GameCombatComponent implements OnInit, OnDestroy {
 
     this.playerHealthBarPercent = this.calcPercentage(this.player.currentHealth, this.player.maxHealth);
   }
-  
+
   updateEnemyHealthBar(): void {
     if (!this.player || !this.enemy) {
       return;
@@ -171,6 +172,7 @@ export class GameCombatComponent implements OnInit, OnDestroy {
     if (!this.player || !this.enemy) {
       return true;
     }
+
     return this.player.isDead();
   }
 
