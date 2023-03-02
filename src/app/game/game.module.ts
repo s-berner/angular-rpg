@@ -8,7 +8,9 @@ import { GameGridComponent } from './game-grid/game-grid.component';
 
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
-import {MatListModule} from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DialogComponent } from './dialog/dialog.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +18,7 @@ import {MatListModule} from '@angular/material/list';
     GameCombatComponent,
     GameViewComponent,
     GameGridComponent,
+    DialogComponent,
   ],
   imports: [
     CommonModule,
@@ -23,6 +26,7 @@ import {MatListModule} from '@angular/material/list';
     MatProgressBarModule,
     MatButtonModule,
     MatListModule,
+    MatDialogModule,
   ]
 })
 export class GameModule { }

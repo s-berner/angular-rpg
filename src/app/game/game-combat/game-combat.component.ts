@@ -1,11 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import { Subscription } from 'rxjs';
 
 import { CombatService } from '../combat.service';
+import { DialogComponent } from '../dialog/dialog.component';
 import { Enemy } from '../classes/Enemy';
 import { Player } from '../classes/Player';
 
@@ -27,6 +30,7 @@ export class GameCombatComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private combatService: CombatService,
+    public defeatDialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -56,6 +60,7 @@ export class GameCombatComponent implements OnInit, OnDestroy {
       this.enemySubscription.unsubscribe();
       this.combatService.clearEnemy();
     }
+    this.defeatDialog.closeAll()
   }
 
   calcPercentage(health: number, maxHealth: number): number {
@@ -134,6 +139,9 @@ export class GameCombatComponent implements OnInit, OnDestroy {
     if (this.checkIfPlayerIsDead()) {
       this.combatLog.push(`You have been defeated by ${this.enemy.display}!`)
       // TODO: Add logic to handle player death
+      // for now just go back to welcome scree
+      this.openDefeatDialog();
+      return;
     }
   }
 
@@ -186,5 +194,22 @@ export class GameCombatComponent implements OnInit, OnDestroy {
 
   onReset(): void {
     this.router.navigate(['/game/level']);
+  }
+
+  openDefeatDialog(): void {
+    const config: MatDialogConfig = {
+      disableClose: true,
+      data: {
+        title: 'You have been defeated!',
+        message: 'You have been defeated by the forest zombie! Would you like to try again?',
+        btn1: {
+          title: 'Start Over',
+          matStyle: 'warn',
+          action: this.goToWelcome.bind(this),
+        },
+      }
+    };
+
+    this.defeatDialog.open(DialogComponent, config);
   }
 }
