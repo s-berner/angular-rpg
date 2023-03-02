@@ -11,6 +11,7 @@ import { CombatService } from '../combat.service';
 import { DialogComponent } from '../dialog/dialog.component';
 import { Enemy } from '../classes/Enemy';
 import { Player } from '../classes/Player';
+import { EnemyNamePipe } from '../enemy-name.pipe';
 
 
 @Component({
@@ -25,11 +26,12 @@ export class GameCombatComponent implements OnInit, OnDestroy {
   enemy?: Enemy;
   playerHealthBarPercent = 0;
   enemyHealthBarPercent = 0;
-  combatLog: string[] = ['You encounter a wild forest zombie!',];
+  combatLog: string[] = [];
 
   constructor(
     private router: Router,
     private combatService: CombatService,
+    private enemyNamePipe: EnemyNamePipe,
     public defeatDialog: MatDialog,
   ) { }
 
@@ -46,9 +48,9 @@ export class GameCombatComponent implements OnInit, OnDestroy {
       if (enemy) {
         this.enemy = enemy as Enemy
         this.enemyHealthBarPercent = this.calcPercentage(this.enemy.currentHealth, this.enemy.maxHealth);
+        this.combatLog.push('You have encountered a wild ' + this.enemyNamePipe.transform(enemy.enemyType) + '!');
       }
     });
-
   }
 
   ngOnDestroy(): void {

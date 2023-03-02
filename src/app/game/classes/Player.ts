@@ -4,7 +4,7 @@ import { ElementType } from '../enums/ElementType';
 import { Combatant } from '../interfaces/Combatant';
 
 export class Player extends MoveableEntity implements Combatant {
-  level = 1;
+  level = 0;
   experience = 0;
   maxHealth = 20;
   currentHealth = this.maxHealth;
@@ -44,5 +44,22 @@ export class Player extends MoveableEntity implements Combatant {
 
   isDead(): boolean {
     return this.currentHealth <= 0;
+  }
+
+  gainExp(amount: number): void {
+    this.experience += amount;
+    // check if player leveled up
+    if (this.experience >= this.level * 100) {
+      this.levelUp();
+    }
+  }
+
+  levelUp(): void {
+    this.level++;
+    this.maxHealth += 10;
+    this.currentHealth = this.maxHealth;
+    this.attributes.strength += 5;
+    this.attributes.armor += 2;
+    this.attributes.evasion += 0.05;
   }
 }

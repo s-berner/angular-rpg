@@ -121,7 +121,7 @@ export class Enemy extends MoveableEntity implements Combatant {
     } else if (enemyType === EnemyType.ForestBat) {
       return '🦇';
     } else if (enemyType === EnemyType.ForestSpider) {
-      return '🕷';
+      return '🕷️';
     }
     return '❓';
   }

@@ -11,6 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DialogComponent } from './dialog/dialog.component';
+import { CombatViewCardComponent } from './combat-view-card/combat-view-card.component';
+import { EnemyNamePipe } from './enemy-name.pipe';
 
 @NgModule({
   declarations: [
@@ -19,6 +21,8 @@ import { DialogComponent } from './dialog/dialog.component';
     GameViewComponent,
     GameGridComponent,
     DialogComponent,
+    CombatViewCardComponent,
+    EnemyNamePipe,
   ],
   imports: [
     CommonModule,
@@ -27,6 +31,9 @@ import { DialogComponent } from './dialog/dialog.component';
     MatButtonModule,
     MatListModule,
     MatDialogModule,
-  ]
+  ],
+  providers: [
+    EnemyNamePipe,
+  ],
 })
 export class GameModule { }

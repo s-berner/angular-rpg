@@ -1,12 +1,12 @@
-<div  class="container" *ngIf="player && enemy; else elseBlock">
+<div class="container" *ngIf="player && enemy; else elseBlock">
   <div class="top-container">
     <div class="card-container player">
-      <mat-progress-bar mode="determinate" [value]="playerHealthBarPercent" color="accent" class="hp-bar"></mat-progress-bar>
-      <img src="../../../assets/images/player.png" alt="player" height="300px" width="250">
+      <app-combat-view-card [name]="player.name" [healthBarPercent]="playerHealthBarPercent"
+        healthBarColor="accent"></app-combat-view-card>
     </div>
     <div class="card-container enemy">
-      <mat-progress-bar mode="determinate" [value]="enemyHealthBarPercent" color="warn" class="hp-bar"></mat-progress-bar>
-      <img src="../../../assets/images/enemy.png" alt="enemy" height="300px" width="250">
+      <app-combat-view-card [name]="enemy.enemyType | enemyName" [healthBarPercent]="playerHealthBarPercent"
+        healthBarColor="warn"></app-combat-view-card>
     </div>
   </div>
   <div class="bottom-container">
@@ -15,7 +15,7 @@
       <div>actions</div>
       <div class="actions-container">
         <button mat-raised-button color="accent" (click)="onPlayerAttacks()">Attack</button>
-        <button mat-raised-button color="accent" (click)="onPlayerStealsHealth()" >Steal Health</button>
+        <button mat-raised-button color="accent" (click)="onPlayerStealsHealth()">Steal Health</button>
         <button mat-raised-button color="warn" (click)="onEnemyAttacks()">Enemy Attacks</button>
       </div>
     </div>
@@ -30,6 +30,6 @@
 <ng-template #elseBlock>
   <div style="display: flex; flex-direction: column; gap: .5rem;">
     <div>Player or Enemy not found...</div>
-    <button mat-raised-button color="accent" (click)="onReset()">Reset</button>
+    <button mat-raised-button color="accent" (click)="goToWelcome()">Start new game</button>
   </div>
 </ng-template>

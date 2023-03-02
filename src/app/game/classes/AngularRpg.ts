@@ -6,6 +6,7 @@ import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
 import { Inputs } from "../enums/Inputs";
 import { ElementType } from "../enums/ElementType";
+import { EnemyType } from "../enums/EnemyType";
 
 export class AngularRpg {
   player: Player;
@@ -32,48 +33,29 @@ export class AngularRpg {
 
 
     // check if the player is on an enemy
-    const playerOnTileWithEnemy = this.elements.some(element => {
-      const curPos = element?.getPosition();
-      const playerPos = this.player.getPosition();
-      if (curPos && element?.type === ElementType.Enemy) {
-        const onSameTile = curPos.x === playerPos.x && curPos.y === playerPos.y;
-        if (onSameTile) {
-          this.opponent = element as Enemy;
-          return true;
-        }
-      }
-      return false;
-    });
-
-    if (playerOnTileWithEnemy) {
-      // filter out the enemy
-      console.log('enemy to be removed has id:', this.opponent?.id)
+    this.opponent = this.checkIfPlayerOnTileWithEnemy();
+    if (this.opponent) {
+      // filter out the enemy by its id
       this.elements = this.elements.filter(element => {
-        if (element.type === ElementType.Enemy) {
-          const curId = element?.id;
-          if (curId && curId === this.opponent?.id) {
-            console.log('removing enemy with id:', curId)
+        if (element && this.enemyTypeGuard(element)) {
+          const curId = element.id;
+          if (curId === this.opponent?.id) {
             return false;
           }
         }
         return true;
       });
-
-      console.log('enemies after removal:', this.elements)
     }
 
-    // if the player is on the exit
-    const playerOnExit = this.elements.some(element => {
-      const curPos = element?.getPosition();
-      const playerPos = this.player.getPosition();
-      if (curPos && element?.type === ElementType.Exit) {
-        return curPos.x === playerPos.x && curPos.y === playerPos.y;
-      }
-      return false;
-    });
-    if (playerOnExit) {
+    // if the player has reached the exit
+    const exitReached = this.checkIfPlayerOnTileWithExit();
+    if (exitReached) {
       this.currentStage++;
+      console.log('player before exp gain:', this.player);
+      this.player.gainExp(exitReached.stageCompletedExp);
+      console.log('player after exp gain:', this.player);
       this.generateElements();
+
       return this.elements;
     }
 
@@ -111,7 +93,7 @@ export class AngularRpg {
 
     // add exit
     const exitPos = this.genRandomPos(this.elements.map(element => element?.getPosition()) as Position[]);
-    const exit = new Exit(20, this.currentStage + 1, exitPos.x, exitPos.y);
+    const exit = new Exit(this.currentStage + 1, exitPos.x, exitPos.y);
     this.addElements([exit]);
 
     // Generate enemies
@@ -130,7 +112,8 @@ export class AngularRpg {
     for (let i = 0; i < amount; i++) {
       const position = this.genRandomPos(blockedPositions);
       blockedPositions.push(position);
-      const enemy = new Enemy('enemy' + i, position.x, position.y);
+      const typeToGen: number = Math.floor(Math.random() * (Object.keys(EnemyType).length / 2));
+      const enemy = new Enemy('enemy' + i, typeToGen, position.x, position.y);
       enemies.push(enemy);
     }
 
@@ -191,5 +174,47 @@ export class AngularRpg {
     }
 
     return cluster;
+  }
+
+  checkIfPlayerOnTileWithExit(): Exit | undefined {
+    const exit = (this.elements.filter(element => {
+      if(this.exitTypeGuard(element)) {
+        return true;
+      }
+      return false;
+    }) as Exit[])[0];
+
+    const exitPos = exit.getPosition();
+    const playerPos = this.player.getPosition();
+    if (exitPos.x === playerPos.x && exitPos.y === playerPos.y) {
+      return exit;
+    }
+
+    return undefined;
+  }
+
+  checkIfPlayerOnTileWithEnemy(): Enemy | undefined {
+    const enemies = this.elements.filter(element => {
+      if(this.enemyTypeGuard(element)) {
+        return true;
+      }
+      return false;
+    }) as Enemy[];
+
+    const enemy = enemies.find(enemy => {
+      const enemyPos = enemy.getPosition();
+      const playerPos = this.player.getPosition();
+      return enemyPos.x === playerPos.x && enemyPos.y === playerPos.y;
+    });
+
+    return enemy;
+  }
+
+  enemyTypeGuard(element: GameElement): element is Enemy {
+    return element.type === ElementType.Enemy;
+  }
+
+  exitTypeGuard(element: GameElement): element is Exit {
+    return element.type === ElementType.Exit;
   }
 }
