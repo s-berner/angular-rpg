@@ -43,14 +43,14 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 # step #3
 	Level werden zufällig erstellt / nach mustern generiert. ✅
-	Es gibt verschiedene Monstertypen mit stärken und schwächen.
+	Es gibt verschiedene Monstertypen mit stärken und schwächen. ✅
 	Der Spieler kann seinen Angriffswert ändern.
 	Es gibt aufhebbare Sammelitems die HP steigern.
 
 # to do for step #3
-- add monster types (idea: Bat 🦇, Spider: 🕷️)
-- add items (buffs, heals)
+- add monster types (idea: Bat 🦇, Spider: 🕷️) ✅
 - make player level up
+- add items (buffs, heals)
 
 # misc
 - adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
