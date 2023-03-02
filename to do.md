@@ -8,7 +8,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 	- Output - Angular component
 
 # step #1 ✔
-	Darstellung eines 2D Dungeon. Es ist klar erkennbar welche Felder zum Spielfeld gehören. 
+	Darstellung eines 2D Dungeon. Es ist klar erkennbar welche Felder zum Spielfeld gehören.
 	Es gibt Spieler, Monster und einen Ausgang.
 	Der Spieler kann mit den Pfeiltasten bewegt werden.
 	Erreicht der Spieler den Ausgang, ist das Level beendet und das nächste startet.
@@ -38,8 +38,19 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - develop a service that passes my data, passing in router no bueno ✅
 - think of placeholder attacks, spells for player and enemy ✅
 - implement turnbased combat ✅
-- handle Player win
-- handle Player loss
+- handle Player win ➖
+- handle Player loss ➖
+
+# step #3
+	Level werden zufällig erstellt / nach mustern generiert. ✅
+	Es gibt verschiedene Monstertypen mit stärken und schwächen.
+	Der Spieler kann seinen Angriffswert ändern.
+	Es gibt aufhebbare Sammelitems die HP steigern.
+
+# to do for step #3
+- add monster types (idea: Bat 🦇, Spider: 🕷️)
+- add items (buffs, heals)
+- make player level up
 
 # misc
 - adjust moving that it does not look this dumb, maybe make enemies walk to a target position?
@@ -49,4 +60,7 @@ or pick a direction and walk it until obstructed
 - fix that enemies can walk onto the door ✅
 - add tree clusters as obstruction ✅
 - make combat log a message log component
+- make combat turn based to improve player experiance
 
+# known bugs
+- player cant move in new game after he died
