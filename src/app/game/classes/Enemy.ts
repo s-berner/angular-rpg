@@ -5,23 +5,29 @@ import { Inputs } from '../enums/Inputs';
 import { ElementType } from '../enums/ElementType';
 import { GameElement } from '../interfaces/GameElement';
 import { Position } from '../interfaces/Position';
+import { EnemyType } from '../enums/EnemyType';
 
 export class Enemy extends MoveableEntity implements Combatant {
   maxHealth = 10;
   currentHealth = this.maxHealth;
+  display: string;
   attributes = { strength: 10, armor: 3, evasion: 0.1 };
   inventory: Item[] = [];
-  readonly display = '🧟';
   readonly type = ElementType.Enemy;
   private target?: Position;
   private path?: Inputs[];
 
   constructor (
     readonly id: string,
+    readonly enemyType: EnemyType,
     x: number,
     y: number,
-  ) { super(x, y); }
-    
+  ) {
+    super(x, y);
+    this.display = this.initDisplay(enemyType);
+    this.initAttributes();
+  }
+
   randomMove(elements: GameElement[]): void {
     this.walkToTarget(elements);
   }
@@ -44,7 +50,7 @@ export class Enemy extends MoveableEntity implements Combatant {
         currentPos.y--;
       }
     }
-    
+
     return path;
   }
 
@@ -89,7 +95,7 @@ export class Enemy extends MoveableEntity implements Combatant {
     }
     const damage = this.attributes.strength - target.attributes.armor;
     target.currentHealth -= damage;
-    
+
     return damage;
   }
 
@@ -107,5 +113,32 @@ export class Enemy extends MoveableEntity implements Combatant {
 
   isDead(): boolean {
     return this.currentHealth <= 0;
+  }
+
+  initDisplay(enemyType: EnemyType): string {
+    if (enemyType === EnemyType.ForestZombie) {
+      return '🧟';
+    } else if (enemyType === EnemyType.ForestBat) {
+      return '🦇';
+    } else if (enemyType === EnemyType.ForestSpider) {
+      return '🕷';
+    }
+    return '❓';
+  }
+
+  initAttributes(): void {
+    if (this.enemyType === EnemyType.ForestZombie) {
+      this.maxHealth = 10;
+      this.currentHealth = this.maxHealth;
+      this.attributes = { strength: 10, armor: 3, evasion: 0.1 };
+    } else if (this.enemyType === EnemyType.ForestBat) {
+      this.maxHealth = 5;
+      this.currentHealth = this.maxHealth;
+      this.attributes = { strength: 5, armor: 0, evasion: 0.3 };
+    } else if (this.enemyType === EnemyType.ForestSpider) {
+      this.maxHealth = 5;
+      this.currentHealth = this.maxHealth;
+      this.attributes = { strength: 5, armor: 0, evasion: 0.3 };
+    }
   }
 }
