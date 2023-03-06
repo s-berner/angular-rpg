@@ -4,86 +4,45 @@ import { Item } from './Item';
 import { Inputs } from '../enums/Inputs';
 import { ElementType } from '../enums/ElementType';
 import { GameElement } from '../interfaces/GameElement';
-import { Position } from '../interfaces/Position';
 import { EnemyType } from '../enums/EnemyType';
+import { Attributes } from '../interfaces/Attributes';
 
 export class Enemy extends MoveableEntity implements Combatant {
   maxHealth = 10;
   currentHealth = this.maxHealth;
   display: string;
-  attributes = { strength: 10, armor: 3, evasion: 0.1 };
+  attributes: Attributes = { strength: 10, armor: 3, evasion: 0.1 };
   inventory: Item[] = [];
+  exp = 10;
   readonly type = ElementType.Enemy;
-  private target?: Position;
-  private path?: Inputs[];
 
   constructor (
     readonly id: string,
     readonly enemyType: EnemyType,
+    stage: number,
     x: number,
     y: number,
   ) {
     super(x, y);
     this.display = this.initDisplay(enemyType);
-    this.initAttributes();
+    this.initAttributes(stage);
   }
 
   randomMove(elements: GameElement[]): void {
-    this.walkToTarget(elements);
-  }
-
-  findPathToTarget(target: Position, blockedPositions: Position[]): Inputs[] {
-    const currentPos = this.getPosition();
-    const path: Inputs[] = [];
-    while(target.x !== currentPos.x || target.y !== currentPos.y) {
-      if (target.x > currentPos.x) {
-        path.push(Inputs.Right);
-        currentPos.x++;
-      } else if (target.x < currentPos.x) {
-        path.push(Inputs.Left);
-        currentPos.x--;
-      } else if (target.y > currentPos.y) {
-        path.push(Inputs.Down);
-        currentPos.y++;
-      } else if (target.y < currentPos.y) {
-        path.push(Inputs.Up);
-        currentPos.y--;
-      }
-    }
-
-    return path;
-  }
-
-  findTarget(elements: GameElement[]): Position {
-    const blockedPositions = this.getBlockedPositions(elements);
-    const freePositions = [];
-    for (let x = 0; x < this.mapWidth; x++) {
-      for (let y = 0; y < this.mapHeight; y++) {
-        const pos = { x, y };
-        if (!this.checkIfPosOccupied(pos, blockedPositions)) {
-          freePositions.push(pos);
-        }
-      }
-    }
-    const target = freePositions[Math.floor(Math.random() * freePositions.length)];
-    return target;
-  }
-
-  walkToTarget(elements: GameElement[]): void {
-    const currentPos = this.getPosition();
-    const targetNotSet = this.target === undefined;
-    const arrivedAtTarget = this.target && this.target.x === currentPos.x && this.target.y === currentPos.y;
-    if (targetNotSet || arrivedAtTarget) {
-      this.target = this.findTarget(elements);
-      this.path = this.findPathToTarget(this.target, this.getBlockedPositions(elements));
-    }
-
-    // walk along path
-    if (this.path && this.path.length > 0) {
-      const nextStep = this.path.shift();
-      if (nextStep) {
-        this.move(nextStep, elements, this.type);
-      }
+    const direction = Math.floor(Math.random() * 4);
+    switch (direction) {
+      case Inputs.Up:
+        this.move(Inputs.Up, elements, this.type);
+        break;
+      case Inputs.Down:
+        this.move(Inputs.Down, elements, this.type);
+        break;
+      case Inputs.Left:
+        this.move(Inputs.Left, elements, this.type);
+        break;
+      case Inputs.Right:
+        this.move(Inputs.Right, elements, this.type);
+        break;
     }
   }
 
@@ -126,19 +85,32 @@ export class Enemy extends MoveableEntity implements Combatant {
     return '❓';
   }
 
-  initAttributes(): void {
+  initAttributes(stage: number): void {
+    let scalingFactor = 1 + (stage - 1) * 0.1; // increase attributes by 10% per stage
     if (this.enemyType === EnemyType.ForestZombie) {
-      this.maxHealth = 10;
+      this.maxHealth = Math.round(5 * scalingFactor);
       this.currentHealth = this.maxHealth;
-      this.attributes = { strength: 10, armor: 3, evasion: 0.1 };
+      this.attributes = {
+        strength: Math.round(10 * scalingFactor),
+        armor: Math.round(5 * scalingFactor),
+        evasion: 0.1
+      };
     } else if (this.enemyType === EnemyType.ForestBat) {
-      this.maxHealth = 5;
+      this.maxHealth = Math.round(5 * scalingFactor);
       this.currentHealth = this.maxHealth;
-      this.attributes = { strength: 5, armor: 0, evasion: 0.3 };
+      this.attributes = {
+        strength: Math.round(10 * scalingFactor),
+        armor: 0,
+        evasion: 0.5
+      };
     } else if (this.enemyType === EnemyType.ForestSpider) {
-      this.maxHealth = 5;
+      this.maxHealth = Math.round(5 * scalingFactor);
       this.currentHealth = this.maxHealth;
-      this.attributes = { strength: 5, armor: 0, evasion: 0.3 };
+      this.attributes = {
+        strength: Math.round(10 * scalingFactor),
+        armor: 0,
+        evasion: 0.5
+      };
     }
   }
 }

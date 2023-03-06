@@ -2,19 +2,20 @@ import { MoveableEntity } from './MovableEntity';
 import { Item } from './Item';
 import { ElementType } from '../enums/ElementType';
 import { Combatant } from '../interfaces/Combatant';
+import { Attributes } from '../interfaces/Attributes';
 
 export class Player extends MoveableEntity implements Combatant {
-  level = 0;
-  experience = 0;
+  level = 1;
+  exp = 0;
   maxHealth = 20;
   currentHealth = this.maxHealth;
-  attributes = { strength: 10, armor: 5, evasion: 0.1 };
+  attributes: Attributes = { strength: 10, armor: 5, evasion: 0.1 };
   inventory: Item[] = [];
   readonly display = '🧙‍♂️';
   readonly type = ElementType.Player;
 
   constructor (
-    public name: string,
+    readonly name: string,
     x: number,
     y: number,
   ) { super(x, y); }
@@ -47,15 +48,16 @@ export class Player extends MoveableEntity implements Combatant {
   }
 
   gainExp(amount: number): void {
-    this.experience += amount;
+    this.exp += amount;
     // check if player leveled up
-    if (this.experience >= this.level * 100) {
+    if (this.exp >= this.level * 100) {
       this.levelUp();
     }
   }
 
   levelUp(): void {
     this.level++;
+    this.exp = 0;
     this.maxHealth += 10;
     this.currentHealth = this.maxHealth;
     this.attributes.strength += 5;

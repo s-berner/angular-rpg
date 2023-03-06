@@ -1,5 +1,6 @@
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
+import { Item } from "./Item";
 import { Exit } from "./Exit";
 import { Obstruction } from "./Obstruction";
 import { GameElement } from "../interfaces/GameElement";
@@ -22,46 +23,23 @@ export class AngularRpg {
     // init player object
     const playerPos = this.genRandomPos();
     this.player = new Player(playerName, playerPos.x, playerPos.y);
-
     // generate Game Elements
-    this.generateElements();
+    this.genElements();
   }
 
   operateGame(direction: Inputs): GameElement[] {
     // handle the players move
     this.elements = this.player.move(direction, this.elements, ElementType.Player);
-
-
-    // check if the player is on an enemy
-    this.opponent = this.checkIfPlayerOnTileWithEnemy();
-    if (this.opponent) {
-      // filter out the enemy by its id
-      this.elements = this.elements.filter(element => {
-        if (element && this.enemyTypeGuard(element)) {
-          const curId = element.id;
-          if (curId === this.opponent?.id) {
-            return false;
-          }
-        }
-        return true;
-      });
-    }
-
-    // if the player has reached the exit
-    const exitReached = this.checkIfPlayerOnTileWithExit();
-    if (exitReached) {
-      this.currentStage++;
-      console.log('player before exp gain:', this.player);
-      this.player.gainExp(exitReached.stageCompletedExp);
-      console.log('player after exp gain:', this.player);
-      this.generateElements();
-
-      return this.elements;
+    // check if the player and any other element are on the same tile
+    const elementOnTile = this.isCurrentTileOccupied();
+    if (elementOnTile) {
+      // if so, handle the interaction
+      this.handleInteraction(elementOnTile);
     }
 
     // move each enemy
     this.elements.forEach(element => {
-      if (element?.type === ElementType.Enemy) {
+      if (element.type === ElementType.Enemy) {
         const enemy = element as Enemy;
         enemy.randomMove(this.elements);
       }
@@ -78,32 +56,27 @@ export class AngularRpg {
     this.elements.push(...elements);
   }
 
-  generateElements(): void {
-    // ! player is persistent so they are not generated here
+  genElements(): void {
     // Clear game elements
     this.clearElements();
-
     // Add player
     this.addElements([this.player]);
-
     // Generate obstructions
     for (let i = 0; i < 3; i++) {
-      this.addElements(this.genObstrCluster(this.elements.map(element => element?.getPosition()) as Position[]));
+      this.addElements(this.genObstrCluster(this.elements.map(element => element.getPosition()) as Position[]));
     }
-
     // add exit
-    const exitPos = this.genRandomPos(this.elements.map(element => element?.getPosition()) as Position[]);
+    const exitPos = this.genRandomPos(this.elements.map(element => element.getPosition()) as Position[]);
     const exit = new Exit(this.currentStage + 1, exitPos.x, exitPos.y);
     this.addElements([exit]);
-
-    // Generate enemies
-    // ? current stage is used to determine the number of enemies
-    // ? i think stage + 1 is a good number
+    // generate enemies
     const enemies = this.genEnemies(this.currentStage + 1);
     this.addElements(enemies);
 
-    // TODO Generate items
-    // ...
+    // generate a item for now
+    const itemPos = this.genRandomPos(this.elements.map(element => element.getPosition()) as Position[]);
+    const item = new Item('Red Apple', 'Eat this apple to replenish your health', '🍎', 'i0', itemPos.x, itemPos.y);
+    this.addElements([item]);
   }
 
   genEnemies(amount: number): Enemy[] {
@@ -113,7 +86,7 @@ export class AngularRpg {
       const position = this.genRandomPos(blockedPositions);
       blockedPositions.push(position);
       const typeToGen: number = Math.floor(Math.random() * (Object.keys(EnemyType).length / 2));
-      const enemy = new Enemy('enemy' + i, typeToGen, position.x, position.y);
+      const enemy = new Enemy('enemy' + i, typeToGen, this.currentStage, position.x, position.y);
       enemies.push(enemy);
     }
 
@@ -176,38 +149,21 @@ export class AngularRpg {
     return cluster;
   }
 
-  checkIfPlayerOnTileWithExit(): Exit | undefined {
-    const exit = (this.elements.filter(element => {
-      if(this.exitTypeGuard(element)) {
-        return true;
+  isCurrentTileOccupied(): GameElement | undefined {
+    const element = this.elements.find(element => {
+      if (this.playerTypeGuard(element)) {
+        return false;
       }
-      return false;
-    }) as Exit[])[0];
-
-    const exitPos = exit.getPosition();
-    const playerPos = this.player.getPosition();
-    if (exitPos.x === playerPos.x && exitPos.y === playerPos.y) {
-      return exit;
-    }
-
-    return undefined;
-  }
-
-  checkIfPlayerOnTileWithEnemy(): Enemy | undefined {
-    const enemies = this.elements.filter(element => {
-      if(this.enemyTypeGuard(element)) {
-        return true;
-      }
-      return false;
-    }) as Enemy[];
-
-    const enemy = enemies.find(enemy => {
-      const enemyPos = enemy.getPosition();
+      const elementPos = element.getPosition();
       const playerPos = this.player.getPosition();
-      return enemyPos.x === playerPos.x && enemyPos.y === playerPos.y;
+      return elementPos.x === playerPos.x && elementPos.y === playerPos.y;
     });
 
-    return enemy;
+    return element;
+  }
+
+  playerTypeGuard (element: GameElement): element is Player {
+    return element.type === ElementType.Player;
   }
 
   enemyTypeGuard(element: GameElement): element is Enemy {
@@ -216,5 +172,51 @@ export class AngularRpg {
 
   exitTypeGuard(element: GameElement): element is Exit {
     return element.type === ElementType.Exit;
+  }
+
+  itemTypeGuard(element: GameElement): element is Item {
+    return element.type === ElementType.Item;
+  }
+
+  handleInteraction(element: GameElement): void {
+    if (this.enemyTypeGuard(element)) {
+      this.handleEnemyInteraction(element);
+    } else if (this.exitTypeGuard(element)) {
+      this.handleExitInteraction(element);
+    } else if (this.itemTypeGuard(element)) {
+      this.handleItemInteraction(element);
+    }
+  }
+
+  handleEnemyInteraction(enemy: Enemy): void {
+    this.opponent = enemy;
+    this.elements = this.elements.filter(element => {
+      if (element && this.enemyTypeGuard(element)) {
+        const curId = element.id;
+        if (curId === this.opponent?.id) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  handleExitInteraction(exit: Exit): void {
+    this.currentStage++;
+    this.player.gainExp(exit.exp);
+    this.genElements();
+  }
+
+  handleItemInteraction(item: Item): void {
+    item.action(this.player);
+    this.elements = this.elements.filter(element => {
+      if (element && this.itemTypeGuard(element)) {
+        const curId = element.id;
+        if (curId === item.id) {
+          return false;
+        }
+      }
+      return true;
+    });
   }
 }

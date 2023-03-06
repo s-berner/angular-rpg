@@ -1,14 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { AngularRpg } from './classes/AngularRpg';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AngularRpgService {
+export class AngularRpgService implements OnDestroy {
   private angularRpg!: AngularRpg;
   constructor() { }
-  
-  setAngularRpg(angularRpg: AngularRpg) {
+
+  ngOnDestroy(): void {
+    console.log('AngularRpgService.ngOnDestroy() called');
+  }
+
+  setAngularRpg(angularRpg: AngularRpg): void {
     this.angularRpg = angularRpg;
   }
 

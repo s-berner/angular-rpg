@@ -13,6 +13,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { DialogComponent } from './dialog/dialog.component';
 import { CombatViewCardComponent } from './combat-view-card/combat-view-card.component';
 import { EnemyNamePipe } from './enemy-name.pipe';
+import { GameMessageLogComponent } from './game-message-log/game-message-log.component';
+import { GamePlayerInfoComponent } from './game-player-info/game-player-info.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { EnemyNamePipe } from './enemy-name.pipe';
     DialogComponent,
     CombatViewCardComponent,
     EnemyNamePipe,
+    GameMessageLogComponent,
+    GamePlayerInfoComponent,
   ],
   imports: [
     CommonModule,

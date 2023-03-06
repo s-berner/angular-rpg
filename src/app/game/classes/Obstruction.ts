@@ -8,9 +8,8 @@ export class Obstruction {
     private x: number,
     private y: number
   ) { }
-    
+
   getPosition(): Position {
     return { x: this.x, y: this.y };
   }
-
 }

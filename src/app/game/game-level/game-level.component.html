@@ -1,4 +1,7 @@
-<app-game-grid [gridHeight]="angularRpg.height"
-               [gridWidth]="angularRpg.width"
-               [gameElements]="gameElements" >
-</app-game-grid>
+<div class="container">
+  <app-game-player-info [player]="angularRpg.player"></app-game-player-info>
+  <app-game-grid [gridHeight]="angularRpg.height"
+                 [gridWidth]="angularRpg.width"
+                 [gameElements]="gameElements" >
+  </app-game-grid>
+</div>

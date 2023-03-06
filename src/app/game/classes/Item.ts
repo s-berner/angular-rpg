@@ -1,21 +1,26 @@
 import { Position } from "../interfaces/Position";
 import { ElementType } from "../enums/ElementType";
+import { Player } from "./Player";
 
 export class Item {
-  readonly display = '🗡';
   readonly type = ElementType.Item;
   readonly position: { x: number, y: number };
   constructor(
     readonly name: string,
     readonly description: string,
+    readonly display: string,
+    readonly id: string,
     x: number,
     y: number,
-    readonly attributes: { dmg: number, def: number, evade: number }
-  ) { 
-    this.position = { x, y }; 
+  ) {
+    this.position = { x, y };
   }
 
   getPosition(): Position {
     return this.position;
+  }
+
+  action(player: Player) {
+    player.heal(5);
   }
 }

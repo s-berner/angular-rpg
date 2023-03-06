@@ -57,6 +57,7 @@ export class GameLevelComponent implements OnInit {
     }
 
     if(this.angularRpg.opponent) {
+      console.log('opponent found');
       this.goToCombat(this.angularRpg.player, this.angularRpg.opponent);
       this.angularRpg.opponent = undefined;
     }

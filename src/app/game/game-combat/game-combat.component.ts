@@ -1,8 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { MatProgressBar } from '@angular/material/progress-bar';
-import { MatButton } from '@angular/material/button';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import { Subscription } from 'rxjs';
@@ -89,6 +86,7 @@ export class GameCombatComponent implements OnInit, OnDestroy {
         TODO: Add logic to handle enemy death (loot, exp, etc.)
         for now just go back to game-level
       */
+      this.player.gainExp(this.enemy.exp);
       return this.goToGameLevel();
     }
 
@@ -192,10 +190,6 @@ export class GameCombatComponent implements OnInit, OnDestroy {
     }
 
     return this.enemy.isDead();
-  }
-
-  onReset(): void {
-    this.router.navigate(['/game/level']);
   }
 
   openDefeatDialog(): void {

@@ -2,16 +2,14 @@ import { ElementType } from "../enums/ElementType";
 import { Inputs } from "../enums/Inputs";
 import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
-import { Enemy } from "./Enemy";
-import { Player } from "./Player";
 
-export class MoveableEntity {
+export abstract class MoveableEntity {
   readonly mapWidth = 10;
   readonly mapHeight = 10;
   constructor (
     private x: number,
     private y: number) { }
-    
+
   getPosition(): Position {
     return { x: this.x, y: this.y };
   }
@@ -22,7 +20,7 @@ export class MoveableEntity {
     }
 
     // get desired position
-    const desiredPos: Position = this.getPosition(); 
+    const desiredPos: Position = this.getPosition();
     switch(direction) {
       case Inputs.Up:
         desiredPos.y--;
@@ -59,7 +57,7 @@ export class MoveableEntity {
         return false;
       })[0] as GameElement;
 
-      switch (occupant?.type) {
+      switch (occupant.type) {
         case ElementType.Enemy:
           // prevent enemies stacking in same tile
           if (myType === ElementType.Enemy) {
@@ -67,10 +65,13 @@ export class MoveableEntity {
           }
           break;
         case ElementType.Item:
-          // TODO: pick up item
+          // if enemey prevent steping on item
+          if (myType === ElementType.Enemy) {
+            return elements;
+          }
           break;
         case ElementType.Obstruction:
-          // cant move 
+          // cant move
           if(myType === ElementType.Player) {
             // TODO: display message to player
           }
@@ -92,20 +93,19 @@ export class MoveableEntity {
     // if move is valid and tile is not occupied move the entity
     this.x = desiredPos.x;
     this.y = desiredPos.y;
-    
-    return elements;      
+
+    return elements;
   }
 
   checkIfOutOfBounds(desiredPos: Position): boolean {
     const outOfBounds = desiredPos.x < 0 || desiredPos.x > this.mapWidth - 1 || desiredPos.y < 0 || desiredPos.y > this.mapHeight - 1;
     return outOfBounds;
-  }	
+  }
 
   checkIfPosOccupied(desiredPos: Position, blockedPositions: Position[]): boolean {
     const occupied = blockedPositions.some(blockedPos => {
       return blockedPos.x === desiredPos.x && blockedPos.y === desiredPos.y;
     });
-
     return occupied;
   }
 

@@ -5,7 +5,7 @@
         healthBarColor="accent"></app-combat-view-card>
     </div>
     <div class="card-container enemy">
-      <app-combat-view-card [name]="enemy.enemyType | enemyName" [healthBarPercent]="playerHealthBarPercent"
+      <app-combat-view-card [name]="enemy.enemyType | enemyName" [healthBarPercent]="enemyHealthBarPercent"
         healthBarColor="warn"></app-combat-view-card>
     </div>
   </div>
@@ -16,14 +16,11 @@
       <div class="actions-container">
         <button mat-raised-button color="accent" (click)="onPlayerAttacks()">Attack</button>
         <button mat-raised-button color="accent" (click)="onPlayerStealsHealth()">Steal Health</button>
-        <button mat-raised-button color="warn" (click)="onEnemyAttacks()">Enemy Attacks</button>
+        <!-- <button mat-raised-button color="warn" (click)="onEnemyAttacks()">Enemy Attacks</button> -->
       </div>
     </div>
     <div>
-      <div>combat log</div>
-      <mat-list class="combat-log">
-        <mat-list-item *ngFor="let message of combatLog" class="combat-log-item">{{ message }}</mat-list-item>
-      </mat-list>
+      <app-game-message-log title="combat log" [messages]="combatLog"></app-game-message-log>
     </div>
   </div>
 </div>
