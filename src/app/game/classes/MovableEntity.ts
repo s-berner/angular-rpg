@@ -3,28 +3,24 @@ import { Inputs } from "../enums/Inputs";
 import { GameElement } from "../interfaces/GameElement";
 import { Position } from "../interfaces/Position";
 
-/** 
- * TODO: Check for collisions with other entities (enemies, items, walls, etc.)
- */
-export class MoveableEntity {
-  outOfBoundsMsg = 'can\'t move out of bounds';
+export abstract class MoveableEntity {
   readonly mapWidth = 10;
   readonly mapHeight = 10;
   constructor (
     private x: number,
     private y: number) { }
-    
+
   getPosition(): Position {
     return { x: this.x, y: this.y };
   }
 
-  move(direction: Inputs, elements: GameElement[]): GameElement[] {
+  move(direction: Inputs, elements: GameElement[], myType: ElementType): GameElement[] {
     if (direction == Inputs.None) {
       return elements;
     }
 
     // get desired position
-    const desiredPos: Position = this.getPosition(); 
+    const desiredPos: Position = this.getPosition();
     switch(direction) {
       case Inputs.Up:
         desiredPos.y--;
@@ -44,18 +40,15 @@ export class MoveableEntity {
     const outOfBounds = this.checkIfOutOfBounds(desiredPos);
     if (outOfBounds) {
       // TODO: display message to user
-      console.log(this.outOfBoundsMsg);
       return elements;
     }
 
     // check if desired position is occupied
-    const blockedPositions = elements
-      .filter(element => element !== undefined)
-      .map(element => element?.getPosition()) as Position[];
+    const blockedPositions = this.getBlockedPositions(elements);
     const isOccupied = this.checkIfPosOccupied(desiredPos, blockedPositions);
     if(isOccupied) {
       // check what occupies the tile and handle each case accordingly
-      const occupant = elements.filter(element => {
+      let occupant = elements.filter(element => {
         const curPos = element?.getPosition()
         if (curPos) {
           return curPos.x === desiredPos.x && curPos.y === desiredPos.y;
@@ -64,27 +57,32 @@ export class MoveableEntity {
         return false;
       })[0] as GameElement;
 
-      switch (occupant?.type) {
+      switch (occupant.type) {
         case ElementType.Enemy:
-          // TODO: init combat
-          console.log('🔪 fighting', occupant.name, 'at', desiredPos, 'and won 🔪🩸');
-          elements = elements.filter(element => element?.name !== occupant.name);
+          // prevent enemies stacking in same tile
+          if (myType === ElementType.Enemy) {
+            return elements;
+          }
           break;
         case ElementType.Item:
-          // TODO: pick up item
-          console.log('can move, to', desiredPos, 'occupied by item');
-          return elements;
-        case ElementType.Wall:
-          // cant move 
-          // TODO: display message to player
-          console.log('can\'t move, to', desiredPos, 'occupied by wall');
+          // if enemey prevent steping on item
+          if (myType === ElementType.Enemy) {
+            return elements;
+          }
+          break;
+        case ElementType.Obstruction:
+          // cant move
+          if(myType === ElementType.Player) {
+            // TODO: display message to player
+          }
           return elements;
         case ElementType.Player:
           // ? how do i want to handle if enemy wants to move into player
           return elements;
         case ElementType.Exit:
-          console.log('can move, to', desiredPos, 'occupied by exit');
-          elements = elements.filter(element => element?.type === ElementType.Player);
+          if(myType === ElementType.Enemy) {
+            return elements;
+          }
           break;
         default:
           // case that would go here is ElementType.Empty or undefined?
@@ -94,21 +92,27 @@ export class MoveableEntity {
 
     // if move is valid and tile is not occupied move the entity
     this.x = desiredPos.x;
-    this.y = desiredPos.y;  
-    
-    return elements;      
+    this.y = desiredPos.y;
+
+    return elements;
   }
 
   checkIfOutOfBounds(desiredPos: Position): boolean {
     const outOfBounds = desiredPos.x < 0 || desiredPos.x > this.mapWidth - 1 || desiredPos.y < 0 || desiredPos.y > this.mapHeight - 1;
     return outOfBounds;
-  }	
+  }
 
   checkIfPosOccupied(desiredPos: Position, blockedPositions: Position[]): boolean {
     const occupied = blockedPositions.some(blockedPos => {
       return blockedPos.x === desiredPos.x && blockedPos.y === desiredPos.y;
     });
-
     return occupied;
+  }
+
+  getBlockedPositions(elements: GameElement[]): Position[] {
+    const blockedPositions = elements
+      .filter(element => element !== undefined)
+      .map(element => element?.getPosition()) as Position[];
+    return blockedPositions;
   }
 }

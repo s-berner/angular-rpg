@@ -1,6 +1,14 @@
-import { Component, HostListener, OnInit, Output } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+
+import { Router } from '@angular/router';
+
 import { AngularRpg } from '../classes/AngularRpg';
+import { GameElement } from '../interfaces/GameElement';
 import { Inputs } from '../enums/Inputs';
+import { CombatService } from '../combat.service';
+import { AngularRpgService } from '../angular-rpg.service';
+import { Player } from '../classes/Player';
+import { Enemy } from '../classes/Enemy';
 
 @Component({
   selector: 'app-game-level',
@@ -8,45 +16,63 @@ import { Inputs } from '../enums/Inputs';
   styleUrls: ['./game-level.component.css']
 })
 export class GameLevelComponent implements OnInit {
-  game!: AngularRpg;
-  @Output()htmlGrid: string[][] = [];
-  
+  angularRpg!: AngularRpg;
+  gameElements: GameElement[] = [];
+
+  constructor(
+    private router: Router,
+    private combatService: CombatService,
+    private angularRpgService: AngularRpgService
+  ) { }
+
   ngOnInit(): void {
-    this.game = new AngularRpg('🧙', 10, 10);
-    this.htmlGrid = this.game.getFormattedGrid();
+    console.log('ngOnInit() called in game-level.component.ts');
+    this.angularRpg = this.angularRpgService.getAngularRpg();
+    const player = this.combatService.getPlayer();
+    if (player) {
+      this.angularRpg.player = player;
+    }
+    this.gameElements = this.angularRpg.elements;
   }
 
   @HostListener('window:keydown', ['$event'])
   onKeypress(event: KeyboardEvent): void {
     switch(event.key) {
       case 'w':
-        this.game.handlePlayerInput(Inputs.Up);
-        break;
       case 'ArrowUp':
-        this.game.handlePlayerInput(Inputs.Up);
+        this.gameElements = this.angularRpg.operateGame(Inputs.Up);
         break;
       case 'a':
-        this.game.handlePlayerInput(Inputs.Left);
-        break;
       case 'ArrowLeft':
-        this.game.handlePlayerInput(Inputs.Left);
+        this.gameElements = this.angularRpg.operateGame(Inputs.Left);
         break;
       case 's':
-        this.game.handlePlayerInput(Inputs.Down);
-        break;
       case 'ArrowDown':
-        this.game.handlePlayerInput(Inputs.Down);
+        this.gameElements = this.angularRpg.operateGame(Inputs.Down);
         break;
       case 'd':
-        this.game.handlePlayerInput(Inputs.Right);
-        break;
       case 'ArrowRight':
-        this.game.handlePlayerInput(Inputs.Right);
+        this.gameElements = this.angularRpg.operateGame(Inputs.Right);
         break;
     }
-  
-    // TODO: make enemys move after player moves
 
-    this.htmlGrid = this.game.getFormattedGrid();
+    if(this.angularRpg.opponent) {
+      console.log('opponent found');
+      this.goToCombat(this.angularRpg.player, this.angularRpg.opponent);
+      this.angularRpg.opponent = undefined;
+    }
+
+    // this forces the view to update
+    let newElementsArray: GameElement[] = [];
+    this.gameElements.forEach((element: GameElement) => {
+      newElementsArray.push(element);
+    });
+    this.gameElements = newElementsArray;
+  }
+
+  goToCombat(player: Player, opponent: Enemy): void {
+    this.combatService.setPlayer(player);
+    this.combatService.setEnemy(opponent);
+    this.router.navigate(['/game/combat']);
   }
 }

@@ -2,15 +2,27 @@
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
-    border: 3px ridge brown;
+    border: 3px ridge var(--secondary);
 }
 
-.grid-item {
+.grid-tile {
     width: 75px;
     height: 75px;
     background-color: var(--floor);
-    border: .1px solid brown;
+    border: .1px solid var(--secondary);
     text-align: center;
     font-size: 30px;
     line-height: 75px;
+}
+
+.player {
+    background-color: var(--secondary);
+}
+
+.obstruction {
+    background-color: var(--darkalert);
+}
+
+.enemy {
+    background-color: var(--alert);
 }
