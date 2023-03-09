@@ -101,8 +101,6 @@ export class AngularRpg {
       const positionIsBlocked = blockedPositions.some(blockedPosition => blockedPosition.x === position.x && blockedPosition.y === position.y)
       if (positionIsBlocked) {
         return this.genRandomPos(blockedPositions);
-      } else {
-        return position;
       }
     }
 

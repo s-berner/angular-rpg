@@ -15,7 +15,5 @@ export class DialogComponent {
       btn1: {title: string, matStyle: string, action: () => void;},
       btn2?: {title: string, matStyle: string, action: () => void;}
     }
-  ) {
-    console.log(data);
-  }
+  ) { }
 }

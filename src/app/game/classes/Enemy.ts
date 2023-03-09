@@ -88,7 +88,7 @@ export class Enemy extends MoveableEntity implements Combatant {
   initAttributes(stage: number): void {
     let scalingFactor = 1 + (stage - 1) * 0.1; // increase attributes by 10% per stage
     if (this.enemyType === EnemyType.ForestZombie) {
-      this.maxHealth = Math.round(5 * scalingFactor);
+      this.maxHealth = Math.round(15 * scalingFactor);
       this.currentHealth = this.maxHealth;
       this.attributes = {
         strength: Math.round(10 * scalingFactor),
@@ -96,7 +96,7 @@ export class Enemy extends MoveableEntity implements Combatant {
         evasion: 0.1
       };
     } else if (this.enemyType === EnemyType.ForestBat) {
-      this.maxHealth = Math.round(5 * scalingFactor);
+      this.maxHealth = Math.round(10 * scalingFactor);
       this.currentHealth = this.maxHealth;
       this.attributes = {
         strength: Math.round(10 * scalingFactor),
@@ -104,7 +104,7 @@ export class Enemy extends MoveableEntity implements Combatant {
         evasion: 0.5
       };
     } else if (this.enemyType === EnemyType.ForestSpider) {
-      this.maxHealth = Math.round(5 * scalingFactor);
+      this.maxHealth = Math.round(10 * scalingFactor);
       this.currentHealth = this.maxHealth;
       this.attributes = {
         strength: Math.round(10 * scalingFactor),
